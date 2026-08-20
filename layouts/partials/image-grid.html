@@ -35,7 +35,8 @@
 <div class="image-grid" data-gallery="{{ $gid }}">
   {{ range $i, $img := $gallery }}
     <button type="button" class="image-grid-cell" data-index="{{ $i }}" aria-label="{{ $img.title }}">
-      <img src="{{ $img.src | relURL }}" alt="{{ $img.title }}{{ with $img.caption }} — {{ . }}{{ end }}">
+      {{ $alt := $img.title }}{{ with $img.caption }}{{ $alt = printf "%s — %s" $img.title . }}{{ end }}
+      {{ partial "img.html" (dict "src" $img.src "alt" $alt "variant" "card") }}
     </button>
   {{ end }}
 </div>
@@ -49,7 +50,7 @@
         {{ range $gallery }}
           <div class="swiper-slide">
             <div class="gallery-slide-inner">
-              <img src="{{ .src | relURL }}" alt="{{ .title }}">
+              {{ partial "img.html" (dict "src" .src "alt" .title "variant" "lightbox") }}
               <a class="gallery-meta" href="{{ .url }}">
                 <h3>{{ .title }}</h3>
                 {{ with .description }}<p>{{ . }}</p>{{ end }}
@@ -68,7 +69,7 @@
       <div class="swiper-wrapper">
         {{ range $gallery }}
           <div class="swiper-slide">
-            <img src="{{ .src | relURL }}" alt="">
+            {{ partial "img.html" (dict "src" .src "alt" "" "variant" "thumb") }}
           </div>
         {{ end }}
       </div>

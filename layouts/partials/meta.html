@@ -17,11 +17,7 @@
 
 {{ $imgAbs := "" }}
 {{ if $img }}
-  {{ if or (hasPrefix $img "http://") (hasPrefix $img "https://") }}
-    {{ $imgAbs = $img }}
-  {{ else }}
-    {{ $imgAbs = $img | absURL }}
-  {{ end }}
+  {{ $imgAbs = partial "img-url.html" (dict "src" $img "variant" "og" "absolute" true) }}
 {{ end }}
 
 {{ $fullTitle := .Title }}
@@ -44,6 +40,13 @@
 <meta name="twitter:title" content="{{ $fullTitle }}">
 {{ with $desc }}<meta name="twitter:description" content="{{ . }}">{{ end }}
 {{ with $imgAbs }}<meta name="twitter:image" content="{{ . }}">{{ end }}
+
+<link rel="alternate" type="application/rss+xml" title="{{ .Site.Title }}" href="{{ "index.xml" | absURL }}">
+{{ if not .IsHome }}
+  {{ with .OutputFormats.Get "RSS" }}
+  <link rel="alternate" type="application/rss+xml" title="{{ $.Title }}" href="{{ .Permalink }}">
+  {{ end }}
+{{ end }}
 
 {{ $path := .RelPermalink }}
 {{ if or (eq .Kind "taxonomy") (eq .Kind "term") (eq .Section "people") (eq .Section "manufacturers") (hasPrefix $path "/content/") (eq $path "/content/") (hasPrefix $path "/admin/") }}

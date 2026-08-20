@@ -19,7 +19,16 @@
     ) }}
   {{ end }}
 {{ end }}
-{{ $privacy := "/sivut/tietosuoja/" }}
+{{ $privacyPage := false }}
+{{ range site.RegularPages }}
+  {{ if eq .Layout "privacy" }}{{ $privacyPage = . }}{{ end }}
+{{ end }}
+{{ $privacy := "" }}
+{{ $privacyTitle := "" }}
+{{ with $privacyPage }}
+  {{ $privacy = .RelPermalink }}
+  {{ $privacyTitle = .Title }}
+{{ end }}
 <script type="application/json" id="tukko-consent-config">{{ dict "privacyUrl" $privacy "systems" $systems | jsonify | safeHTML }}</script>
 
 <div id="cookie-banner" class="cookie-banner" hidden>
@@ -27,7 +36,7 @@
     <div class="cookie-banner-copy">
       <p class="cookie-banner-title">{{ $consent.bannerTitle | default "Evästeet" }}</p>
       <p>{{ $consent.bannerText | default "Käytämme evästeitä sivuston toimintaan ja, suostumuksellasi, analytiikkaan." }}</p>
-      <p class="cookie-banner-privacy"><a href="{{ $privacy | relURL }}">Tietosuojaseloste</a></p>
+      {{ if $privacy }}<p class="cookie-banner-privacy"><a href="{{ $privacy }}">{{ $privacyTitle }}</a></p>{{ end }}
     </div>
     <div class="cookie-banner-actions">
       <button type="button" class="cta-button" data-consent="all">Hyväksy kaikki</button>

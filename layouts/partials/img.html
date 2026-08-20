@@ -1,0 +1,16 @@
+{{- $key := printf "%s|%s|%t" (.src | default "") (.variant | default "gallery") (.absolute | default false) -}}
+{{- $p := partialCached "img-process.html" . $key | transform.Unmarshal -}}
+{{- $alt := .alt | default "" -}}
+{{- $class := .class | default "" -}}
+{{- $loading := "lazy" -}}
+{{- if .eager }}{{ $loading = "eager" }}{{ end -}}
+{{- if $p.url -}}
+{{- if and $p.webp (ne $p.webp $p.jpeg) -}}
+<picture>
+  <source type="image/webp" srcset="{{ $p.webp }}">
+  <img src="{{ $p.jpeg | default $p.url }}" alt="{{ $alt }}"{{ with $class }} class="{{ . }}"{{ end }}{{ if $p.width }} width="{{ $p.width }}"{{ end }}{{ if $p.height }} height="{{ $p.height }}"{{ end }} loading="{{ $loading }}" decoding="async">
+</picture>
+{{- else -}}
+<img src="{{ $p.url }}" alt="{{ $alt }}"{{ with $class }} class="{{ . }}"{{ end }}{{ if $p.width }} width="{{ $p.width }}"{{ end }}{{ if $p.height }} height="{{ $p.height }}"{{ end }} loading="{{ $loading }}" decoding="async">
+{{- end -}}
+{{- end -}}

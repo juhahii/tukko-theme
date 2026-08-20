@@ -1,0 +1,72 @@
+{{- $src := .src | default "" -}}
+{{- $variant := .variant | default "gallery" -}}
+{{- $absolute := .absolute | default false -}}
+{{- $out := dict "url" "" "webp" "" "jpeg" "" "width" 0 "height" 0 -}}
+{{- if $src -}}
+  {{- $fallback := $src -}}
+  {{- if not (or (hasPrefix $src "http://") (hasPrefix $src "https://")) -}}
+    {{- if $absolute -}}{{ $fallback = $src | absURL }}{{- else -}}{{ $fallback = $src | relURL }}{{- end -}}
+  {{- end -}}
+  {{- $out = merge $out (dict "url" $fallback) -}}
+  {{- if not (or (hasPrefix $src "http://") (hasPrefix $src "https://")) -}}
+    {{- $rel := strings.TrimPrefix "/" $src -}}
+    {{- $rel = strings.TrimPrefix "media/" $rel -}}
+    {{- $res := resources.Get (printf "media/%s" $rel) -}}
+    {{- if $res -}}
+      {{- $ext := strings.ToLower (path.Ext $res.Name) -}}
+      {{- if eq $ext ".svg" -}}
+        {{- $u := $res.RelPermalink -}}
+        {{- if $absolute -}}{{ $u = $res.Permalink }}{{- end -}}
+        {{- $out = dict "url" $u "jpeg" $u "webp" "" "width" $res.Width "height" $res.Height -}}
+      {{- else -}}
+        {{- $jpeg := false -}}
+        {{- $webp := false -}}
+        {{- if eq $variant "card" -}}
+          {{- $jpeg = $res.Fill "480x360 Center q70 jpeg" -}}
+          {{- $webp = $res.Fill "480x360 Center q70 webp" -}}
+        {{- else if eq $variant "split" -}}
+          {{- $jpeg = $res.Fill "900x675 Center q75 jpeg" -}}
+          {{- $webp = $res.Fill "900x675 Center q75 webp" -}}
+        {{- else if eq $variant "gallery" -}}
+          {{- $jpeg = $res.Fill "1200x900 Center q75 jpeg" -}}
+          {{- $webp = $res.Fill "1200x900 Center q75 webp" -}}
+        {{- else if eq $variant "thumb" -}}
+          {{- $jpeg = $res.Fill "240x240 Center q65 jpeg" -}}
+          {{- $webp = $res.Fill "240x240 Center q65 webp" -}}
+        {{- else if eq $variant "lightbox" -}}
+          {{- $w := $res.Width -}}
+          {{- if gt $w 1920 -}}{{ $w = 1920 }}{{- end -}}
+          {{- $jpeg = $res.Resize (printf "%dx q80 jpeg" $w) -}}
+          {{- $webp = $res.Resize (printf "%dx q80 webp" $w) -}}
+        {{- else if eq $variant "logo" -}}
+          {{- $fmt := "jpeg" -}}
+          {{- if eq $ext ".png" -}}{{ $fmt = "png" }}{{- end -}}
+          {{- $w := $res.Width -}}
+          {{- if gt $w 400 -}}{{ $w = 400 }}{{- end -}}
+          {{- $jpeg = $res.Resize (printf "%dx %s q90" $w $fmt) -}}
+        {{- else if eq $variant "og" -}}
+          {{- $jpeg = $res.Fill "1200x630 Center q80 jpeg" -}}
+        {{- else -}}
+          {{- $jpeg = $res.Fill "1200x900 Center q75 jpeg" -}}
+          {{- $webp = $res.Fill "1200x900 Center q75 webp" -}}
+        {{- end -}}
+        {{- $jpegUrl := "" -}}
+        {{- $webpUrl := "" -}}
+        {{- $uw := 0 -}}
+        {{- $uh := 0 -}}
+        {{- $url := $fallback -}}
+        {{- if $jpeg -}}
+          {{- $uw = $jpeg.Width -}}
+          {{- $uh = $jpeg.Height -}}
+          {{- if $absolute -}}{{ $jpegUrl = $jpeg.Permalink }}{{- else -}}{{ $jpegUrl = $jpeg.RelPermalink }}{{- end -}}
+          {{- $url = $jpegUrl -}}
+        {{- end -}}
+        {{- if $webp -}}
+          {{- if $absolute -}}{{ $webpUrl = $webp.Permalink }}{{- else -}}{{ $webpUrl = $webp.RelPermalink }}{{- end -}}
+        {{- end -}}
+        {{- $out = dict "url" $url "jpeg" $jpegUrl "webp" $webpUrl "width" $uw "height" $uh -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- $out | jsonify -}}

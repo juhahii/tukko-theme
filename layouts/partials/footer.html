@@ -2,7 +2,7 @@
   <div class="footer-inner">
     <div class="footer-brand">
       {{ with .Site.Data.site.logo_small }}
-        <a href="/"><img src="{{ . | relURL }}" alt="{{ $.Site.Title }}" class="footer-logo"></a>
+        <a href="/">{{ partial "img.html" (dict "src" . "alt" $.Site.Title "class" "footer-logo" "variant" "logo") }}</a>
       {{ else }}
         <a href="/" class="footer-logo-text">{{ $.Site.Title }}</a>
       {{ end }}

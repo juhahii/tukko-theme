@@ -3,13 +3,13 @@
     <a href="/" class="logo">
       {{ if .IsHome }}
         {{ with .Site.Data.site.logo_large }}
-          <img src="{{ . | relURL }}" alt="{{ $.Site.Title }}" class="logo-large">
+          {{ partial "img.html" (dict "src" . "alt" $.Site.Title "class" "logo-large" "variant" "logo" "eager" true) }}
         {{ else }}
           <span class="logo-text">{{ $.Site.Title }}</span>
         {{ end }}
       {{ else }}
         {{ with .Site.Data.site.logo_small }}
-          <img src="{{ . | relURL }}" alt="{{ $.Site.Title }}" class="logo-small">
+          {{ partial "img.html" (dict "src" . "alt" $.Site.Title "class" "logo-small" "variant" "logo" "eager" true) }}
         {{ else }}
           <span class="logo-text">{{ $.Site.Title }}</span>
         {{ end }}
@@ -27,10 +27,18 @@
         <a href="{{ .RelPermalink }}">{{ .Title }}</a>
       {{ end }}
       {{ $menu := .Site.Data.site.menu | default (dict "products" true "references" true "pages" true "kampanjat" true) }}
-      {{ if and $menu.products (partial "show-subpages.html" "products") }}<a href="/tuotteet/">Tuotteet</a>{{ end }}
-      {{ if and $menu.references (partial "show-subpages.html" "references") }}<a href="/referenssit/">Referenssit</a>{{ end }}
-      {{ if and $menu.pages (partial "show-subpages.html" "pages") }}<a href="/sivut/">Sivut</a>{{ end }}
-      {{ if and $menu.kampanjat (partial "show-subpages.html" "kampanjat") }}<a href="/kampanjat/">Kampanjat</a>{{ end }}
+      {{ if and $menu.products (partial "show-subpages.html" "products") }}
+        {{ with site.GetPage "/tuotteet" }}<a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ end }}
+      {{ end }}
+      {{ if and $menu.references (partial "show-subpages.html" "references") }}
+        {{ with site.GetPage "/referenssit" }}<a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ end }}
+      {{ end }}
+      {{ if and $menu.pages (partial "show-subpages.html" "pages") }}
+        {{ with site.GetPage "/sivut" }}<a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ end }}
+      {{ end }}
+      {{ if and $menu.kampanjat (partial "show-subpages.html" "kampanjat") }}
+        {{ with site.GetPage "/kampanjat" }}<a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ end }}
+      {{ end }}
     </nav>
   </div>
 </header>

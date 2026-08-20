@@ -19,7 +19,7 @@
     </div>
     {{ with $img }}
       <div class="landing-media">
-        <img src="{{ . | relURL }}" alt="{{ $page.Title }}">
+        {{ partial "img.html" (dict "src" . "alt" $page.Title "variant" "split") }}
       </div>
     {{ end }}
   </a>

@@ -1,0 +1,65 @@
+{{- $types := slice "Tuote" "Referenssi" "Sivu" "Kampanja" -}}
+{{- $pages := slice -}}
+{{- if .IsHome -}}
+  {{- $pages = where site.RegularPages "Params.content_type" "in" $types -}}
+{{- else if eq .Section "tuotteet" -}}
+  {{- $pages = where site.RegularPages "Params.content_type" "Tuote" -}}
+{{- else if eq .Section "referenssit" -}}
+  {{- $pages = where site.RegularPages "Params.content_type" "Referenssi" -}}
+{{- else if eq .Section "kampanjat" -}}
+  {{- $pages = where site.RegularPages "Params.content_type" "Kampanja" -}}
+{{- else if eq .Section "sivut" -}}
+  {{- $pages = where site.RegularPages "Params.content_type" "Sivu" -}}
+{{- end -}}
+{{- $pages = where $pages "Layout" "!=" "privacy" -}}
+{{- $dated := slice -}}
+{{- range $pages -}}
+  {{- if .Permalink -}}
+    {{- $d := .Lastmod -}}
+    {{- if $d.IsZero }}{{ $d = .Date }}{{ end -}}
+    {{- $dated = $dated | append (dict "p" . "d" $d) -}}
+  {{- end -}}
+{{- end -}}
+{{- $dated = sort $dated "d" "desc" -}}
+{{- $limit := site.Config.Services.RSS.Limit -}}
+{{- if ge $limit 1 -}}{{ $dated = $dated | first $limit }}{{- end -}}
+{{- $desc := "" -}}
+{{- with .Params.description }}{{ $desc = . }}{{ end -}}
+{{- if not $desc }}{{ with site.Params.description }}{{ $desc = . }}{{ end }}{{ end -}}
+{{- if not $desc }}{{ with site.Data.site.description }}{{ $desc = . }}{{ end }}{{ end -}}
+{{- if not $desc }}{{ $desc = "Uusin sisältö" }}{{ end -}}
+{{- $built := now -}}
+{{- if gt (len $dated) 0 -}}
+  {{- with (index $dated 0).d -}}
+    {{- if not .IsZero }}{{ $built = . }}{{ end -}}
+  {{- end -}}
+{{- end -}}
+{{- printf "<?xml version=%q encoding=%q standalone=%q?>" "1.0" "utf-8" "yes" | safeHTML }}
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} – {{ site.Title }}{{ end }}</title>
+    <link>{{ .Permalink }}</link>
+    <description>{{ $desc | transform.XMLEscape | safeHTML }}</description>
+    <generator>Hugo</generator>
+    <language>{{ site.Language.LanguageCode }}</language>
+    <lastBuildDate>{{ $built.Format "Mon, 02 Jan 2006 15:04:05 -0700" | safeHTML }}</lastBuildDate>
+    {{- with .OutputFormats.Get "RSS" }}
+    {{ printf "<atom:link href=%q rel=%q type=%q />" .Permalink "self" .MediaType | safeHTML }}
+    {{- end }}
+    {{- range $dated }}
+    {{- $p := .p -}}
+    <item>
+      <title>{{ $p.Title | transform.XMLEscape | safeHTML }}</title>
+      <link>{{ $p.Permalink }}</link>
+      {{- if not .d.IsZero }}
+      <pubDate>{{ .d.Format "Mon, 02 Jan 2006 15:04:05 -0700" | safeHTML }}</pubDate>
+      {{- end }}
+      <guid>{{ $p.Permalink }}</guid>
+      {{- $itemDesc := $p.Params.description | default ($p.Summary | plainify) -}}
+      {{- with $itemDesc }}
+      <description>{{ . | transform.XMLEscape | safeHTML }}</description>
+      {{- end }}
+    </item>
+    {{- end }}
+  </channel>
+</rss>

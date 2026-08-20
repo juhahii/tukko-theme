@@ -8,11 +8,7 @@
 {{ $abs := "" }}
 {{ $logo := $site.logo_large | default $site.logo_small | default "" }}
 {{ if $logo }}
-  {{ if or (hasPrefix $logo "http://") (hasPrefix $logo "https://") }}
-    {{ $abs = $logo }}
-  {{ else }}
-    {{ $abs = $logo | absURL }}
-  {{ end }}
+  {{ $abs = partial "img-url.html" (dict "src" $logo "variant" "logo" "absolute" true) }}
 {{ end }}
 
 {{ $orgType := "Organization" }}
@@ -53,10 +49,10 @@
 {{ if not $desc }}{{ with $site.description }}{{ $desc = . }}{{ end }}{{ end }}
 
 {{ $images := slice }}
-{{ with .Params.teaserImage }}{{ $images = $images | append (cond (or (hasPrefix . "http://") (hasPrefix . "https://")) . (. | absURL)) }}{{ end }}
+{{ with .Params.teaserImage }}{{ $images = $images | append (partial "img-url.html" (dict "src" . "variant" "gallery" "absolute" true)) }}{{ end }}
 {{ range .Params.mainImages }}
   {{ with .image }}
-    {{ $images = $images | append (cond (or (hasPrefix . "http://") (hasPrefix . "https://")) . (. | absURL)) }}
+    {{ $images = $images | append (partial "img-url.html" (dict "src" . "variant" "gallery" "absolute" true)) }}
   {{ end }}
 {{ end }}
 {{ if and (not $images) $abs }}{{ $images = $images | append $abs }}{{ end }}
@@ -89,14 +85,19 @@
 {{ $sectionName := "" }}
 {{ $sectionURL := "" }}
 {{ $ct := .Params.content_type | default "" }}
+{{ $secPage := false }}
 {{ if or (eq $ct "Tuote") (eq .Section "tuotteet") }}
-  {{ $sectionName = "Tuotteet" }}{{ $sectionURL = "/tuotteet/" | absURL }}
+  {{ $secPage = site.GetPage "/tuotteet" }}
 {{ else if or (eq $ct "Referenssi") (eq .Section "referenssit") }}
-  {{ $sectionName = "Referenssit" }}{{ $sectionURL = "/referenssit/" | absURL }}
+  {{ $secPage = site.GetPage "/referenssit" }}
 {{ else if or (eq $ct "Kampanja") (eq .Section "kampanjat") }}
-  {{ $sectionName = "Kampanjat" }}{{ $sectionURL = "/kampanjat/" | absURL }}
+  {{ $secPage = site.GetPage "/kampanjat" }}
 {{ else if or (eq $ct "Sivu") (eq .Section "sivut") }}
-  {{ $sectionName = "Sivut" }}{{ $sectionURL = "/sivut/" | absURL }}
+  {{ $secPage = site.GetPage "/sivut" }}
+{{ end }}
+{{ with $secPage }}
+  {{ $sectionName = .Title }}
+  {{ $sectionURL = .Permalink }}
 {{ end }}
 
 {{ $is404 := in .RelPermalink "404" }}

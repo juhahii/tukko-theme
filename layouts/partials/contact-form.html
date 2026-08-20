@@ -1,25 +1,35 @@
-<form name="contact" method="POST" data-netlify="true" class="contact-form">
-  <input type="hidden" name="form-name" value="contact" />
-  <p class="hidden">
-    <label>Älä täytä tätä jos olet ihminen: <input name="bot-field" /></label>
-  </p>
+{{ $email := "" }}
+{{ with site.Data.site.contact }}{{ with .email }}{{ $email = . }}{{ end }}{{ end }}
+{{ $action := "/" }}
+{{ with page }}{{ $action = .RelPermalink }}{{ end }}
 
-  <p>
-    <label for="cf-email">Sähköposti</label>
-    <input type="email" id="cf-email" name="email" required />
-  </p>
+<div class="contact-form-box" data-contact-form>
+  <div class="contact-form-success" hidden tabindex="-1">
+    <p class="contact-form-success-title">Viesti lähetetty</p>
+    <p>Kiitos, olemme vastaanottaneet viestisi. Palaamme asiaan arkipäivisin.</p>
+  </div>
 
-  <p>
-    <label for="cf-message">Viesti</label>
-    <textarea id="cf-message" name="message" rows="5" required></textarea>
-  </p>
+  <form name="contact" method="POST" action="{{ $action }}" data-netlify="true" data-netlify-honeypot="bot-field" class="contact-form">
+    <input type="hidden" name="form-name" value="contact" />
+    <p class="hidden">
+      <label>Älä täytä tätä jos olet ihminen: <input name="bot-field" /></label>
+    </p>
 
-  <p class="form-privacy-note">
-    Lähettämällä lomakkeen sähköpostiosoitteesi ja viestisi tallennetaan
-    <strong>Netlify Formsiin</strong> yhteydenottoon vastaamiseksi.
-    Tämä ei ole seurantaeäste — lomake toimii ilman analytiikkasuostumusta.
-    <a href="{{ "/sivut/tietosuoja/" | relURL }}">Tietosuojaseloste</a>
-  </p>
+    <p>
+      <label for="cf-email">Sähköposti</label>
+      <input type="email" id="cf-email" name="email" required autocomplete="email" />
+    </p>
 
-  <button type="submit">Lähetä</button>
-</form>
+    <p>
+      <label for="cf-message">Viesti</label>
+      <textarea id="cf-message" name="message" rows="5" required></textarea>
+    </p>
+
+    <p class="contact-form-error" role="alert" hidden>
+      Viestin lähetys epäonnistui. Kokeile hetken kuluttua uudelleen{{ if $email }}
+      tai lähetä sähköpostia: <a href="{{ printf "mailto:%s" $email | safeURL }}">{{ $email }}</a>{{ end }}.
+    </p>
+
+    <button type="submit" data-label="Lähetä" data-busy="Lähetetään…">Lähetä</button>
+  </form>
+</div>

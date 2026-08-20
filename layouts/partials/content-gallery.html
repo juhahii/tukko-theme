@@ -9,10 +9,11 @@
 <div class="media-gallery">
   <div class="swiper swiper-media-main">
     <div class="swiper-wrapper">
-      {{ range $images }}
+      {{ range $i, $im := $images }}
       <div class="swiper-slide">
         <figure class="media-slide">
-          <img src="{{ .image | relURL }}" alt="{{ $.Title }}{{ with .caption }} — {{ . }}{{ end }}">
+          {{ $alt := $.Title }}{{ with $im.caption }}{{ $alt = printf "%s — %s" $.Title . }}{{ end }}
+          {{ partial "img.html" (dict "src" $im.image "alt" $alt "variant" "gallery" "eager" (eq $i 0)) }}
           {{ with .caption }}<figcaption>{{ . }}</figcaption>{{ end }}
         </figure>
       </div>
@@ -28,7 +29,7 @@
     <div class="swiper-wrapper">
       {{ range $images }}
       <div class="swiper-slide">
-        <img src="{{ .image | relURL }}" alt="">
+        {{ partial "img.html" (dict "src" .image "alt" "" "variant" "thumb") }}
       </div>
       {{ end }}
     </div>

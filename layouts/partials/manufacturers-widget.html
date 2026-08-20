@@ -28,7 +28,7 @@
         <span class="manufacturer-name">{{ .Title }}</span>
       {{ end }}
       {{ if .Params.logo }}
-        <img class="manufacturer-logo" src="{{ .Params.logo | relURL }}" alt="{{ .Title }}">
+        {{ partial "img.html" (dict "src" .Params.logo "alt" .Title "class" "manufacturer-logo" "variant" "logo") }}
       {{ else if not $showTitles }}
         <span class="manufacturer-name">{{ .Title }}</span>
       {{ end }}

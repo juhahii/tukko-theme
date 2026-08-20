@@ -2,7 +2,7 @@ backend:
   name: git-gateway
 local_backend: true
 
-media_folder: "static/media"
+media_folder: "assets/media"
 public_folder: "/media"
 
 collections:

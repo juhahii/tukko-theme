@@ -1,0 +1,50 @@
+# Copy to the site root as hugo.toml and fill in title / baseURL.
+# Hugo 0.123+ extended. The [imaging] and [module] mounts are required
+# for this theme's image pipeline (assets/media → processed WebP/JPEG,
+# originals still at /media/ for Decap preview).
+
+baseURL = 'https://www.example.fi/'
+languageCode = 'fi'
+title = 'Yrityksen nimi'
+defaultContentLanguage = 'fi'
+theme = 'tukko'
+
+enableRobotsTXT = true
+
+[params]
+  description = ''
+
+[frontmatter]
+  date = ['date', 'publishDate', ':fileModTime']
+  lastmod = ['lastmod', 'date', ':fileModTime']
+
+[services.rss]
+  limit = 20
+
+disableKinds = ['taxonomy', 'term']
+
+[taxonomies]
+
+[imaging]
+  quality = 75
+  resampleFilter = 'Lanczos'
+  [imaging.exif]
+    disableDate = true
+    disableLatLong = true
+
+[module]
+  [[module.mounts]]
+    source = 'content'
+    target = 'content'
+  [[module.mounts]]
+    source = 'data'
+    target = 'data'
+  [[module.mounts]]
+    source = 'assets'
+    target = 'assets'
+  [[module.mounts]]
+    source = 'static'
+    target = 'static'
+  [[module.mounts]]
+    source = 'assets/media'
+    target = 'static/media'

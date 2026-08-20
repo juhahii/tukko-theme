@@ -3,7 +3,7 @@
   {{ partial "hidden-section.html" . }}
 {{ else }}
   {{ $cfg := site.Data.frontpage.pages | default dict }}
-  <h2>{{ $cfg.title | default "Sivut" }}</h2>
+  <h2>{{ $cfg.title | default .Title }}</h2>
   {{ with $cfg.content }}<div class="section-content">{{ . | markdownify }}</div>{{ end }}
   {{ partial "section-ctas.html" $cfg.ctas }}
   {{ $items := where .Site.RegularPages "Params.content_type" "Sivu" }}

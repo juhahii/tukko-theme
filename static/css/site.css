@@ -26,6 +26,7 @@ img {
   height: auto;
   display: block;
 }
+picture { display: contents; }
 
 /* Header */
 .site-header {
@@ -577,12 +578,6 @@ main > .frontpage-section:first-child { border-top: none; padding-top: 0; margin
 .privacy-system h3 { margin: 0 0 0.45rem; font-size: 1.05rem; }
 .privacy-system ul { margin: 0; padding-left: 1.1rem; }
 .privacy-extra { margin-top: 1.5rem; }
-.form-privacy-note {
-  font-size: 0.85rem;
-  color: var(--color-muted);
-  margin: 0 0 1rem;
-  line-height: 1.45;
-}
 
 /* Product + simple pages */
 .gallery img {
@@ -817,6 +812,7 @@ main > .frontpage-section:first-child { border-top: none; padding-top: 0; margin
 }
 
 /* Contact form */
+.contact-form-box,
 form.contact-form {
   max-width: 480px;
   margin: 1rem 0 2rem;
@@ -856,9 +852,36 @@ form.contact-form button {
 form.contact-form button:hover {
   opacity: 0.9;
 }
+form.contact-form button:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
 form.contact-form .hidden {
   display: none;
 }
+.contact-form-success {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface));
+}
+.contact-form-success-title {
+  margin: 0 0 0.35rem;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+.contact-form-success p { margin: 0 0 0.4rem; }
+.contact-form-success p:last-child { margin-bottom: 0; }
+.contact-form-error {
+  margin: 0 0 0.85rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 0.9rem;
+}
+.contact-form-box.is-success form.contact-form { display: none; }
 
 /* People */
 .people-widget {

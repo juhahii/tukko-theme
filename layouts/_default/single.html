@@ -19,7 +19,7 @@
         {{ $manuf := partial "rel-by-slug.html" (dict "pages" (where site.RegularPages "Section" "manufacturers") "key" .) }}
         {{ if and $manuf $manuf.Params.logo }}
           <a class="product-brand" href="{{ $manuf.Params.link | default $manuf.RelPermalink }}"{{ if $manuf.Params.link }} target="_blank" rel="noopener"{{ end }}>
-            <img src="{{ $manuf.Params.logo | relURL }}" alt="{{ $manuf.Title }}">
+            {{ partial "img.html" (dict "src" $manuf.Params.logo "alt" $manuf.Title "variant" "logo") }}
           </a>
         {{ else }}
           <p class="product-brand-name">{{ if $manuf }}{{ $manuf.Title }}{{ else }}{{ . }}{{ end }}</p>
@@ -82,9 +82,10 @@
   {{ end }}
 {{ end }}
 
+  {{ $fp := site.Data.frontpage | default dict }}
   {{ if or .Params.showPeople .Params.people }}
   <div class="people-widget-wrapper">
-    <h2>Yhteyshenkilöt</h2>
+    {{ with $fp.people }}{{ with .title }}<h2>{{ . }}</h2>{{ end }}{{ end }}
     {{ partial "people-widget.html" .Params.people }}
   </div>
   {{ end }}
@@ -98,7 +99,7 @@
 
   {{ if .Params.showContactForm }}
   <div class="contact-form-wrapper">
-    <h2>Ota yhteyttä</h2>
+    {{ with $fp.contactForm }}{{ with .title }}<h2>{{ . }}</h2>{{ end }}{{ end }}
     {{ partial "contact-form.html" . }}
   </div>
   {{ end }}

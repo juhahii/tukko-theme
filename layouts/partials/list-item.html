@@ -3,7 +3,7 @@
 <div class="list-item">
   {{ with $item.Params.teaserImage }}
     <a class="list-item-media" href="{{ $item.RelPermalink }}">
-      <img src="{{ . | relURL }}" alt="{{ $item.Title }}">
+      {{ partial "img.html" (dict "src" . "alt" $item.Title "variant" "card") }}
     </a>
   {{ end }}
   <div class="list-item-body">
