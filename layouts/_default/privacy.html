@@ -1,0 +1,86 @@
+{{ define "title" }}{{ .Title }} | {{ .Site.Title }}{{ end }}
+{{ define "main" }}
+{{ $consent := site.Data.consent | default dict }}
+{{ $contact := site.Data.site.contact | default dict }}
+{{ $gaFallback := "" }}
+{{ with site.Data.site.analytics }}{{ with .google }}{{ $gaFallback = . }}{{ end }}{{ end }}
+<article class="simple-page privacy-page">
+  <header class="simple-header">
+    <h1>{{ .Title | default "Tietosuojaseloste" }}</h1>
+    {{ with .Params.description }}<p class="simple-lead">{{ . }}</p>{{ end }}
+    <p class="simple-meta">Päivitetty {{ now.Format "2.1.2006" }}</p>
+  </header>
+
+  <div class="simple-body content privacy-body">
+    <h2>Rekisterinpitäjä</h2>
+    <p>
+      {{ $.Site.Title }}<br>
+      {{ with $contact.address }}{{ . }}<br>{{ end }}
+      {{ with $contact.email }}<a href="mailto:{{ . }}">{{ . }}</a><br>{{ end }}
+      {{ with $contact.phone }}{{ . }}{{ end }}
+    </p>
+
+    <h2>Mitä tietoja keräämme</h2>
+    <p>
+      Verkkosivusto voi käsitellä evästeisiin ja käyttölokeihin liittyviä tietoja sekä yhteydenottolomakkeella
+      lähettämiäsi tietoja (sähköpostiosoite ja viesti). Lomaketiedot välitetään Netlify Formsiin ja käsitellään
+      yhteydenottoon vastaamiseksi. Lomaketta ei kytketä pois evästevalinnalla.
+    </p>
+
+    <h2>Evästeet ja seurantapalvelut</h2>
+    <p>
+      Välttämättömät evästeet ovat aina käytössä, jotta sivusto toimii ja evästevalintasi säilyy.
+      Muut alla olevat palvelut kytketään päälle vain, jos annat niihin suostumuksen.
+    </p>
+
+    {{ $any := false }}
+    {{ range $consent.systems }}
+      {{ if .enabled | default true }}
+        {{ $any = true }}
+        {{ $mid := .measurementId | default "" }}
+        {{ if and (eq .type "ga4") (not $mid) }}{{ $mid = $gaFallback }}{{ end }}
+        <section class="privacy-system">
+          <h3>{{ .name | default .id }}</h3>
+          <ul>
+            {{ with .provider }}<li><strong>Toimittaja:</strong> {{ . }}</li>{{ end }}
+            {{ with .purpose }}<li><strong>Tarkoitus:</strong> {{ . }}</li>{{ end }}
+            <li><strong>Suostumus:</strong>
+              {{ if eq (.inBanner | default true) false }}
+                ei evästesuostumusta — henkilötietoja käsitellään lomakkeen tai palvelun tuottamiseksi
+              {{ else if .required }}
+                pakollinen
+              {{ else }}
+                valinnainen, kysytään evästebannerissa
+              {{ end }}
+            </li>
+            {{ with .cookies }}<li><strong>Evästeet:</strong> {{ . }}</li>{{ end }}
+            {{ if $mid }}<li><strong>Tunniste:</strong> {{ $mid }}</li>{{ end }}
+            {{ with .privacyUrl }}<li><strong>Lisätietoja:</strong> <a href="{{ . }}" target="_blank" rel="noopener">tietosuojakäytäntö</a></li>{{ end }}
+          </ul>
+        </section>
+      {{ end }}
+    {{ end }}
+    {{ if not $any }}
+      <p>Tällä hetkellä ei ole määritetty valinnaisia seurantapalveluita.</p>
+    {{ end }}
+
+    <h2>Oikeutesi</h2>
+    <p>
+      Sinulla on oikeus tarkastaa, oikaista ja poistaa tietojasi sekä vastustaa käsittelyä ja perua suostumus.
+      Voit tehdä pyynnön rekisterinpitäjälle. Valvontaviranomainen Suomessa on Tietosuojavaltuutetun toimisto.
+    </p>
+
+    <h2>Evästeasetukset</h2>
+    <p>Voit muuttaa suostumustasi milloin tahansa:</p>
+    <p><button type="button" class="cta-button" data-consent="customize">Avaa evästeasetukset</button></p>
+
+    {{ with $consent.extraContent }}
+      <div class="privacy-extra">{{ . | markdownify }}</div>
+    {{ end }}
+
+    {{ with $.Content }}
+      <div class="privacy-extra">{{ . }}</div>
+    {{ end }}
+  </div>
+</article>
+{{ end }}

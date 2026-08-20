@@ -1,0 +1,1026 @@
+backend:
+  name: git-gateway
+local_backend: true
+
+media_folder: "static/media"
+public_folder: "/media"
+
+collections:
+  - name: "content"
+    label: "Sisältö"
+    folder: "content/content"
+    create: true
+    slug: "{{slug}}"
+    # Show content type in the Sisältö collection listing
+    summary: "{{fields.content_type}} — {{title}}"
+    sortable_fields: ["commit_date", "title", "content_type"]
+    view_filters:
+      - label: Tuotteet
+        field: content_type
+        pattern: Tuote
+      - label: Referenssit
+        field: content_type
+        pattern: Referenssi
+      - label: Kampanjat
+        field: content_type
+        pattern: Kampanja
+      - label: Sivut
+        field: content_type
+        pattern: Sivu
+    view_groups:
+      - label: Sisältötyyppi
+        field: content_type
+    fields:
+      - label: "Sisältötyyppi"
+        name: "content_type"
+        widget: "select"
+        options:
+          - { label: "Tuote", value: "Tuote" }
+          - { label: "Referenssi", value: "Referenssi" }
+          - { label: "Sivu", value: "Sivu" }
+          - { label: "Kampanja", value: "Kampanja" }
+        default: "Sivu"
+      - label: "Sivupohja"
+        name: "page_template"
+        widget: "select"
+        options:
+          - { label: "Oletus (tuote → tuotesivu, muut → yksinkertainen)", value: "default" }
+          - { label: "Tuotesivu", value: "product" }
+          - { label: "Yksinkertainen", value: "simple" }
+        default: "default"
+        hint: "Oletus: tuotteet käyttävät tuotesivua, muut yksinkertaista artikkeliasettelua."
+
+      # Common fields (once for all types)
+      - label: "Otsikko"
+        name: "title"
+        widget: "string"
+      - label: "Osoite (URL)"
+        name: "url"
+        widget: "string"
+        required: false
+        hint: "Täyttyy automaattisesti tallennettaessa: /tuotteet/slug/, /referenssit/slug/, /kampanjat/slug/ tai /sivut/slug/. Voit yliajaa käsin."
+      - label: "Kuvaus"
+        name: "description"
+        widget: "text"
+        required: false
+      - label: "Nosta etusivulle"
+        name: "featureInFrontpage"
+        widget: "boolean"
+        default: false
+        required: false
+      - label: "Näytä valikossa"
+        name: "showInMenu"
+        widget: "boolean"
+        default: false
+        required: false
+      - label: "Näytä alatunnisteessa"
+        name: "showInFooter"
+        widget: "boolean"
+        default: false
+        required: false
+      - label: "Näytä yhteystietolomake"
+        name: "showContactForm"
+        widget: "boolean"
+        default: false
+        required: false
+      - label: "Näytä kaikki henkilöt"
+        name: "showPeople"
+        widget: "boolean"
+        default: false
+        required: false
+        hint: "Näyttää kaikki henkilöt sivun lopussa. Ei tarvita, jos valitset henkilöt alla."
+      - label: "Henkilöt tällä sivulla"
+        name: "people"
+        widget: "relation"
+        collection: "people"
+        searchFields: ["title", "role"]
+        valueField: "{{slug}}"
+        displayFields: ["title", "role"]
+        multiple: true
+        required: false
+        hint: "Valitse yksi tai useampi henkilö — he näkyvät sivun lopussa. Tyhjä + 'Näytä kaikki henkilöt' = koko tiimi. Tallennetaan slugina, joten nimen vaihto ei katkaise linkitystä."
+      - label: "Näytä kaikki valmistajat"
+        name: "showManufacturers"
+        widget: "boolean"
+        default: false
+        required: false
+        hint: "Näyttää kaikki valmistajat sivun lopussa. Ei tarvita, jos valitset valmistajat alla."
+      - label: "Valmistajat tällä sivulla"
+        name: "manufacturers"
+        widget: "relation"
+        collection: "manufacturers"
+        searchFields: ["title"]
+        valueField: "{{slug}}"
+        displayFields: ["title"]
+        multiple: true
+        required: false
+        hint: "Valitse yksi tai useampi valmistaja. Tyhjä + 'Näytä kaikki valmistajat' = kaikki merkit. Tallennetaan slugina, joten nimen vaihto ei katkaise linkitystä."
+      - label: "Valmistajat-osion otsikko"
+        name: "manufacturersTitle"
+        widget: "string"
+        required: false
+        hint: "Tyhjä = ei otsikkoa logojen yläpuolella."
+      - label: "Näytä valmistajan nimi logon yllä"
+        name: "showManufacturerTitles"
+        widget: "boolean"
+        default: false
+        required: false
+      - label: "Nosto kuva (teaser)"
+        name: "teaserImage"
+        widget: "image"
+        required: false
+      - label: "Kuvat (pääkuvat / galleria)"
+        name: "mainImages"
+        widget: "list"
+        required: false
+        fields:
+          - label: "Kuva"
+            name: "image"
+            widget: "image"
+          - label: "Kuvateksti (caption, käytä referensseissä)"
+            name: "caption"
+            widget: "string"
+            required: false
+      - label: "Sisältö"
+        name: "body"
+        widget: "markdown"
+        required: false
+
+      # Core field for linking to manufacturer
+      - label: "Valmistaja"
+        name: "manufacturer"
+        widget: "relation"
+        collection: "manufacturers"
+        searchFields: ["title"]
+        valueField: "{{slug}}"
+        displayFields: ["title"]
+        required: false
+        hint: "Tallennetaan slugina. Nimen vaihto CMS:ssä ei katkaise tuotteen valmistajalinkkiä."
+
+      # Product specific (optional)
+      - label: "Hinta (vain tuotteet)"
+        name: "price"
+        widget: "string"
+        required: false
+      - label: "Tärkeimmät ominaisuudet (vain tuotteet)"
+        name: "features"
+        widget: "list"
+        required: false
+        field:
+          label: "Ominaisuus"
+          name: "feature"
+          widget: "string"
+      - label: "Lisätietolinkki (vain tuotteet)"
+        name: "moreInfoLink"
+        widget: "string"
+        required: false
+
+      # Reference specific (optional)
+      - label: "Käytetty tuote (vain referenssit)"
+        name: "usedProduct"
+        widget: "relation"
+        collection: "content"
+        searchFields: ["title"]
+        valueField: "{{slug}}"
+        displayFields: ["title"]
+        required: false
+        hint: "Tallennetaan slugina. Tuotteen nimen vaihto ei katkaise referenssin linkkiä."
+
+  # Asetukset (site-wide and frontpage settings)
+  - name: "frontpage"
+    label: "Asetukset"
+    files:
+      - label: "Etusivun asetukset"
+        name: "frontpage"
+        file: "data/frontpage.yaml"
+        fields:
+          - label: "Tervetuloa"
+            name: "welcome"
+            widget: "object"
+            collapsed: false
+            fields:
+              - label: "Näytä etusivulla"
+                name: "enabled"
+                widget: "boolean"
+                default: true
+              - label: "Järjestys"
+                name: "order"
+                widget: "number"
+                value_type: "int"
+                default: 0
+              - label: "Näytä osion otsikko"
+                name: "showHeading"
+                widget: "boolean"
+                default: true
+                hint: "Jos pois päältä, osion otsikkoa ei näytetä etusivulla."
+              - label: "Otsikko"
+                name: "title"
+                widget: "string"
+                default: "Tervetuloa"
+                required: false
+              - label: "Sisältö"
+                name: "content"
+                widget: "markdown"
+                required: false
+              - label: "Kuva"
+                name: "image"
+                widget: "image"
+                required: false
+                hint: "Jos kuva on lisätty, osio näytetään kahdessa sarakkeessa työpöydällä (teksti + kuva). Pienellä näytöllä otsikko ja teksti tulevat ensin, kuva sen jälkeen."
+              - label: "Toimintakehotteet (CTA)"
+                name: "ctas"
+                widget: "list"
+                required: false
+                hint: "Voit lisätä useita. Linkillä näytetään painike, ilman linkkiä pelkkä teksti."
+                summary: "{{fields.label}}"
+                fields:
+                  - label: "Teksti"
+                    name: "label"
+                    widget: "string"
+                  - label: "Linkki"
+                    name: "url"
+                    widget: "string"
+                    required: false
+                    hint: "Tyhjä = pelkkä teksti. Polku (/tuotteet/), ankkuri (#osio-yhteystiedot), tel:/mailto: tai ulkoinen osoite."
+          - label: "Tietoa meistä"
+            name: "about"
+            widget: "object"
+            collapsed: false
+            fields:
+              - label: "Näytä etusivulla"
+                name: "enabled"
+                widget: "boolean"
+                default: true
+              - label: "Järjestys"
+                name: "order"
+                widget: "number"
+                value_type: "int"
+                default: 40
+              - label: "Näytä osion otsikko"
+                name: "showHeading"
+                widget: "boolean"
+                default: true
+                hint: "Jos pois päältä, osion otsikkoa ei näytetä etusivulla."
+              - label: "Otsikko"
+                name: "title"
+                widget: "string"
+                default: "Tietoa meistä"
+                required: false
+              - label: "Sisältö"
+                name: "content"
+                widget: "markdown"
+                required: false
+                hint: "Landing page -osio ilman alisivuja."
+              - label: "Toimintakehotteet (CTA)"
+                name: "ctas"
+                widget: "list"
+                required: false
+                hint: "Voit lisätä useita. Linkillä näytetään painike, ilman linkkiä pelkkä teksti."
+                summary: "{{fields.label}}"
+                fields:
+                  - label: "Teksti"
+                    name: "label"
+                    widget: "string"
+                  - label: "Linkki"
+                    name: "url"
+                    widget: "string"
+                    required: false
+                    hint: "Tyhjä = pelkkä teksti. Polku (/tuotteet/), ankkuri (#osio-yhteystiedot), tel:/mailto: tai ulkoinen osoite."
+          - label: "Tuotteet-osio"
+            name: "products"
+            widget: "object"
+            collapsed: true
+            fields:
+              - label: "Näytä etusivulla"
+                name: "enabled"
+                widget: "boolean"
+                default: true
+              - label: "Järjestys"
+                name: "order"
+                widget: "number"
+                value_type: "int"
+                default: 10
+              - label: "Näytä osion otsikko"
+                name: "showHeading"
+                widget: "boolean"
+                default: true
+                hint: "Jos pois päältä, osion otsikkoa ei näytetä etusivulla."
+              - label: "Otsikko"
+                name: "title"
+                widget: "string"
+                default: "Tuotteet"
+                required: false
+              - label: "Osion sisältö"
+                name: "content"
+                widget: "markdown"
+                required: false
+                hint: "Näytetään etusivulla osion otsikon alla. Riittää myös yksinään landing page -lohoksi."
+              - label: "Toimintakehotteet (CTA)"
+                name: "ctas"
+                widget: "list"
+                required: false
+                hint: "Voit lisätä useita. Linkillä näytetään painike, ilman linkkiä pelkkä teksti."
+                summary: "{{fields.label}}"
+                fields:
+                  - label: "Teksti"
+                    name: "label"
+                    widget: "string"
+                  - label: "Linkki"
+                    name: "url"
+                    widget: "string"
+                    required: false
+                    hint: "Tyhjä = pelkkä teksti. Polku (/tuotteet/), ankkuri (#osio-yhteystiedot), tel:/mailto: tai ulkoinen osoite."
+              - label: "Näytä kategorian sivut"
+                name: "showSubPages"
+                widget: "boolean"
+                default: true
+                hint: "Jos pois päältä, kategorian kohteita ja listasivua ei näytetä. Osio toimii vain etusivun sisältölohona."
+              - label: "Näyttötila"
+                name: "display"
+                widget: "select"
+                options:
+                  - { label: "Oletus (lista)", value: "default" }
+                  - { label: "Lista (kuten osiosivu)", value: "list" }
+                  - { label: "Kortit (grid)", value: "cards" }
+                  - { label: "Carousel - Cards", value: "carousel-cards" }
+                  - { label: "Carousel - Full width poster", value: "carousel-poster" }
+                  - { label: "Kuvaruudukko (galleria)", value: "image-grid" }
+                  - { label: "Nosto, kuva oikealla", value: "featured-split" }
+                  - { label: "Nosto, kuva vasemmalla", value: "featured-split-left" }
+                default: "cards"
+              - label: "Max määrä näytettäväksi"
+                name: "limit"
+                widget: "number"
+                value_type: "int"
+                default: 3
+              - label: "Näytä navigointinuolit"
+                name: "showNavigation"
+                widget: "boolean"
+                default: true
+          - label: "Referenssit-osio"
+            name: "references"
+            widget: "object"
+            collapsed: true
+            fields:
+              - label: "Näytä etusivulla"
+                name: "enabled"
+                widget: "boolean"
+                default: true
+              - label: "Järjestys"
+                name: "order"
+                widget: "number"
+                value_type: "int"
+                default: 20
+              - label: "Näytä osion otsikko"
+                name: "showHeading"
+                widget: "boolean"
+                default: true
+                hint: "Jos pois päältä, osion otsikkoa ei näytetä etusivulla."
+              - label: "Otsikko"
+                name: "title"
+                widget: "string"
+                default: "Referenssit"
+                required: false
+              - label: "Osion sisältö"
+                name: "content"
+                widget: "markdown"
+                required: false
+                hint: "Näytetään etusivulla osion otsikon alla. Riittää myös yksinään landing page -lohoksi."
+              - label: "Toimintakehotteet (CTA)"
+                name: "ctas"
+                widget: "list"
+                required: false
+                hint: "Voit lisätä useita. Linkillä näytetään painike, ilman linkkiä pelkkä teksti."
+                summary: "{{fields.label}}"
+                fields:
+                  - label: "Teksti"
+                    name: "label"
+                    widget: "string"
+                  - label: "Linkki"
+                    name: "url"
+                    widget: "string"
+                    required: false
+                    hint: "Tyhjä = pelkkä teksti. Polku (/tuotteet/), ankkuri (#osio-yhteystiedot), tel:/mailto: tai ulkoinen osoite."
+              - label: "Näytä kategorian sivut"
+                name: "showSubPages"
+                widget: "boolean"
+                default: true
+                hint: "Jos pois päältä, kategorian kohteita ja listasivua ei näytetä. Osio toimii vain etusivun sisältölohona."
+              - label: "Näyttötila"
+                name: "display"
+                widget: "select"
+                options:
+                  - { label: "Oletus (lista)", value: "default" }
+                  - { label: "Lista (kuten osiosivu)", value: "list" }
+                  - { label: "Kortit (grid)", value: "cards" }
+                  - { label: "Carousel - Cards", value: "carousel-cards" }
+                  - { label: "Carousel - Full width poster", value: "carousel-poster" }
+                  - { label: "Kuvaruudukko (galleria)", value: "image-grid" }
+                  - { label: "Nosto, kuva oikealla", value: "featured-split" }
+                  - { label: "Nosto, kuva vasemmalla", value: "featured-split-left" }
+                default: "cards"
+              - label: "Max määrä näytettäväksi"
+                name: "limit"
+                widget: "number"
+                value_type: "int"
+                default: 3
+              - label: "Näytä navigointinuolit"
+                name: "showNavigation"
+                widget: "boolean"
+                default: true
+          - label: "Sivut-osio"
+            name: "pages"
+            widget: "object"
+            collapsed: true
+            fields:
+              - label: "Näytä etusivulla"
+                name: "enabled"
+                widget: "boolean"
+                default: true
+              - label: "Järjestys"
+                name: "order"
+                widget: "number"
+                value_type: "int"
+                default: 30
+              - label: "Näytä osion otsikko"
+                name: "showHeading"
+                widget: "boolean"
+                default: true
+                hint: "Jos pois päältä, osion otsikkoa ei näytetä etusivulla."
+              - label: "Otsikko"
+                name: "title"
+                widget: "string"
+                default: "Sivut"
+                required: false
+              - label: "Osion sisältö"
+                name: "content"
+                widget: "markdown"
+                required: false
+                hint: "Näytetään etusivulla osion otsikon alla. Riittää myös yksinään landing page -lohoksi."
+              - label: "Toimintakehotteet (CTA)"
+                name: "ctas"
+                widget: "list"
+                required: false
+                hint: "Voit lisätä useita. Linkillä näytetään painike, ilman linkkiä pelkkä teksti."
+                summary: "{{fields.label}}"
+                fields:
+                  - label: "Teksti"
+                    name: "label"
+                    widget: "string"
+                  - label: "Linkki"
+                    name: "url"
+                    widget: "string"
+                    required: false
+                    hint: "Tyhjä = pelkkä teksti. Polku (/tuotteet/), ankkuri (#osio-yhteystiedot), tel:/mailto: tai ulkoinen osoite."
+              - label: "Näytä kategorian sivut"
+                name: "showSubPages"
+                widget: "boolean"
+                default: true
+                hint: "Jos pois päältä, kategorian kohteita ja listasivua ei näytetä. Osio toimii vain etusivun sisältölohona."
+              - label: "Näyttötila"
+                name: "display"
+                widget: "select"
+                options:
+                  - { label: "Oletus (lista)", value: "default" }
+                  - { label: "Lista (kuten osiosivu)", value: "list" }
+                  - { label: "Kortit", value: "cards" }
+                  - { label: "Carousel", value: "carousel" }
+                  - { label: "Kuvaruudukko (galleria)", value: "image-grid" }
+                  - { label: "Nosto, kuva oikealla", value: "featured-split" }
+                  - { label: "Nosto, kuva vasemmalla", value: "featured-split-left" }
+                default: "default"
+              - label: "Max määrä näytettäväksi"
+                name: "limit"
+                widget: "number"
+                value_type: "int"
+                default: 3
+              - label: "Näytä navigointinuolit"
+                name: "showNavigation"
+                widget: "boolean"
+                default: true
+
+          - label: "Kampanjat-osio"
+            name: "kampanjat"
+            widget: "object"
+            collapsed: true
+            fields:
+              - label: "Näytä etusivulla"
+                name: "enabled"
+                widget: "boolean"
+                default: true
+              - label: "Järjestys"
+                name: "order"
+                widget: "number"
+                value_type: "int"
+                default: 40
+              - label: "Näytä osion otsikko"
+                name: "showHeading"
+                widget: "boolean"
+                default: true
+                hint: "Jos pois päältä, osion otsikkoa ei näytetä etusivulla."
+              - label: "Otsikko"
+                name: "title"
+                widget: "string"
+                default: "Kampanjat"
+                required: false
+              - label: "Osion sisältö"
+                name: "content"
+                widget: "markdown"
+                required: false
+                hint: "Näytetään etusivulla osion otsikon alla. Riittää myös yksinään landing page -lohoksi."
+              - label: "Toimintakehotteet (CTA)"
+                name: "ctas"
+                widget: "list"
+                required: false
+                hint: "Voit lisätä useita. Linkillä näytetään painike, ilman linkkiä pelkkä teksti."
+                summary: "{{fields.label}}"
+                fields:
+                  - label: "Teksti"
+                    name: "label"
+                    widget: "string"
+                  - label: "Linkki"
+                    name: "url"
+                    widget: "string"
+                    required: false
+                    hint: "Tyhjä = pelkkä teksti. Polku (/tuotteet/), ankkuri (#osio-yhteystiedot), tel:/mailto: tai ulkoinen osoite."
+              - label: "Näytä kategorian sivut"
+                name: "showSubPages"
+                widget: "boolean"
+                default: true
+                hint: "Jos pois päältä, kategorian kohteita ja listasivua ei näytetä. Osio toimii vain etusivun sisältölohona."
+              - label: "Näyttötila"
+                name: "display"
+                widget: "select"
+                options:
+                  - { label: "Oletus (lista)", value: "default" }
+                  - { label: "Lista (kuten osiosivu)", value: "list" }
+                  - { label: "Kortit (grid)", value: "cards" }
+                  - { label: "Carousel - Cards", value: "carousel-cards" }
+                  - { label: "Carousel - Full width poster", value: "carousel-poster" }
+                  - { label: "Kuvaruudukko (galleria)", value: "image-grid" }
+                  - { label: "Nosto, kuva oikealla", value: "featured-split" }
+                  - { label: "Nosto, kuva vasemmalla", value: "featured-split-left" }
+                default: "cards"
+              - label: "Max määrä näytettäväksi"
+                name: "limit"
+                widget: "number"
+                value_type: "int"
+                default: 3
+              - label: "Näytä navigointinuolit"
+                name: "showNavigation"
+                widget: "boolean"
+                default: true
+
+          - label: "Henkilöt-osio"
+            name: "people"
+            widget: "object"
+            collapsed: true
+            fields:
+              - label: "Näytä etusivulla"
+                name: "enabled"
+                widget: "boolean"
+                default: false
+              - label: "Järjestys"
+                name: "order"
+                widget: "number"
+                value_type: "int"
+                default: 35
+              - label: "Näytä osion otsikko"
+                name: "showHeading"
+                widget: "boolean"
+                default: true
+                hint: "Jos pois päältä, osion otsikkoa ei näytetä etusivulla."
+              - label: "Otsikko"
+                name: "title"
+                widget: "string"
+                default: "Yhteyshenkilöt"
+                required: false
+              - label: "Osion sisältö"
+                name: "content"
+                widget: "markdown"
+                required: false
+              - label: "Valitut henkilöt"
+                name: "members"
+                widget: "relation"
+                collection: "people"
+                searchFields: ["title", "role"]
+                valueField: "{{slug}}"
+                displayFields: ["title", "role"]
+                multiple: true
+                required: false
+                hint: "Tyhjä = näytä kaikki henkilöt. Tallennetaan slugina."
+              - label: "Toimintakehotteet (CTA)"
+                name: "ctas"
+                widget: "list"
+                required: false
+                hint: "Voit lisätä useita. Linkillä näytetään painike, ilman linkkiä pelkkä teksti."
+                summary: "{{fields.label}}"
+                fields:
+                  - label: "Teksti"
+                    name: "label"
+                    widget: "string"
+                  - label: "Linkki"
+                    name: "url"
+                    widget: "string"
+                    required: false
+                    hint: "Tyhjä = pelkkä teksti. Polku (/tuotteet/), ankkuri (#osio-yhteystiedot), tel:/mailto: tai ulkoinen osoite."
+          - label: "Valmistajat-osio"
+            name: "manufacturers"
+            widget: "object"
+            collapsed: true
+            fields:
+              - label: "Näytä etusivulla"
+                name: "enabled"
+                widget: "boolean"
+                default: false
+              - label: "Järjestys"
+                name: "order"
+                widget: "number"
+                value_type: "int"
+                default: 25
+              - label: "Näytä osion otsikko"
+                name: "showHeading"
+                widget: "boolean"
+                default: true
+                hint: "Jos pois päältä, 'Valmistajat'-otsikkoa ei näytetä etusivulla."
+              - label: "Otsikko"
+                name: "title"
+                widget: "string"
+                default: "Valmistajat"
+                required: false
+                hint: "Osion otsikko logojen yläpuolella. Näkyy vain jos 'Näytä osion otsikko' on päällä."
+              - label: "Osion sisältö"
+                name: "content"
+                widget: "markdown"
+                required: false
+              - label: "Näytä valmistajan nimi logon yllä"
+                name: "showTitles"
+                widget: "boolean"
+                default: false
+                hint: "Jos päällä, kunkin merkin nimi näytetään logon yläpuolella."
+              - label: "Valitut valmistajat"
+                name: "members"
+                widget: "relation"
+                collection: "manufacturers"
+                searchFields: ["title"]
+                valueField: "{{slug}}"
+                displayFields: ["title"]
+                multiple: true
+                required: false
+                hint: "Tyhjä = näytä kaikki valmistajat. Tallennetaan slugina."
+              - label: "Toimintakehotteet (CTA)"
+                name: "ctas"
+                widget: "list"
+                required: false
+                hint: "Voit lisätä useita. Linkillä näytetään painike, ilman linkkiä pelkkä teksti."
+                summary: "{{fields.label}}"
+                fields:
+                  - label: "Teksti"
+                    name: "label"
+                    widget: "string"
+                  - label: "Linkki"
+                    name: "url"
+                    widget: "string"
+                    required: false
+                    hint: "Tyhjä = pelkkä teksti. Polku (/tuotteet/), ankkuri (#osio-yhteystiedot), tel:/mailto: tai ulkoinen osoite."
+          - label: "Yhteystietolomake"
+            name: "contactForm"
+            widget: "object"
+            collapsed: true
+            fields:
+              - label: "Näytä etusivulla"
+                name: "enabled"
+                widget: "boolean"
+                default: false
+              - label: "Järjestys"
+                name: "order"
+                widget: "number"
+                value_type: "int"
+                default: 50
+              - label: "Näytä osion otsikko"
+                name: "showHeading"
+                widget: "boolean"
+                default: true
+                hint: "Jos pois päältä, osion otsikkoa ei näytetä etusivulla."
+              - label: "Otsikko"
+                name: "title"
+                widget: "string"
+                default: "Ota yhteyttä"
+                required: false
+              - label: "Osion sisältö"
+                name: "content"
+                widget: "markdown"
+                required: false
+                hint: "Näytetään lomakkeen otsikon alla."
+              - label: "Toimintakehotteet (CTA)"
+                name: "ctas"
+                widget: "list"
+                required: false
+                hint: "Voit lisätä useita. Linkillä näytetään painike, ilman linkkiä pelkkä teksti."
+                summary: "{{fields.label}}"
+                fields:
+                  - label: "Teksti"
+                    name: "label"
+                    widget: "string"
+                  - label: "Linkki"
+                    name: "url"
+                    widget: "string"
+                    required: false
+                    hint: "Tyhjä = pelkkä teksti. Polku (/tuotteet/), ankkuri (#osio-yhteystiedot), tel:/mailto: tai ulkoinen osoite."
+
+      - label: "Tietosuoja ja evästeet"
+        name: "consent"
+        file: "data/consent.yaml"
+        fields:
+          - label: "Bannerin otsikko"
+            name: "bannerTitle"
+            widget: "string"
+            default: "Evästeet"
+          - label: "Bannerin teksti"
+            name: "bannerText"
+            widget: "text"
+          - label: "Lisäteksti tietosuojasivulle"
+            name: "extraContent"
+            widget: "markdown"
+            required: false
+            hint: "Liitetään automaattisesti generoidun tietosuojaselosteen loppuun."
+          - label: "Suostumusta edellyttävät järjestelmät"
+            name: "systems"
+            widget: "list"
+            summary: "{{fields.name}} ({{fields.type}})"
+            hint: "Lisää tähän GA4, tag manager, pikselit ym. Tietosuojasivu ja evästebanneri päivittyvät automaattisesti."
+            fields:
+              - label: "Tunniste (id)"
+                name: "id"
+                widget: "string"
+                hint: "Pysyvä tekninen id, esim. ga4 tai meta-pixel. Älä vaihda myöhemmin."
+              - label: "Nimi"
+                name: "name"
+                widget: "string"
+              - label: "Tarkoitus"
+                name: "purpose"
+                widget: "text"
+                required: false
+              - label: "Toimittaja"
+                name: "provider"
+                widget: "string"
+                required: false
+              - label: "Luokka"
+                name: "category"
+                widget: "select"
+                options:
+                  - { label: "Välttämätön", value: "necessary" }
+                  - { label: "Analytiikka", value: "analytics" }
+                  - { label: "Markkinointi", value: "marketing" }
+                  - { label: "Toiminnallinen", value: "functional" }
+                default: "analytics"
+              - label: "Pakollinen"
+                name: "required"
+                widget: "boolean"
+                default: false
+              - label: "Näytä evästebannerissa"
+                name: "inBanner"
+                widget: "boolean"
+                default: true
+                hint: "Pois päältä = vain tietosuojaseloste (esim. Netlify Forms). Lomaketta ei saa kytkeä evästevalintaan."
+              - label: "Käytössä"
+                name: "enabled"
+                widget: "boolean"
+                default: true
+              - label: "Lataustyyppi"
+                name: "type"
+                widget: "select"
+                options:
+                  - { label: "Ei skriptiä (vain seloste)", value: "none" }
+                  - { label: "Google Analytics 4", value: "ga4" }
+                  - { label: "Google Tag Manager", value: "gtm" }
+                  - { label: "Ulkoinen skripti", value: "script" }
+                default: "none"
+              - label: "Mittaus- tai säiliötunnus"
+                name: "measurementId"
+                widget: "string"
+                required: false
+                hint: "GA4: G-XXXXXXXXXX. GTM: GTM-XXXX."
+              - label: "Skriptin osoite"
+                name: "scriptSrc"
+                widget: "string"
+                required: false
+                hint: "Vain tyypille 'Ulkoinen skripti'."
+              - label: "Evästeet"
+                name: "cookies"
+                widget: "string"
+                required: false
+              - label: "Toimittajan tietosuojalinkki"
+                name: "privacyUrl"
+                widget: "string"
+                required: false
+      - label: "Sivuston asetukset"
+        name: "site"
+        file: "data/site.yaml"
+        fields:
+          - label: "Favicon"
+            name: "favicon"
+            widget: "image"
+            required: false
+          - label: "Pieni logo (valikko / pieni)"
+            name: "logo_small"
+            widget: "image"
+            required: false
+          - label: "Suuri logo (etusivu / päälogo)"
+            name: "logo_large"
+            widget: "image"
+            required: false
+          - label: "Sivuston kuvaus"
+            name: "description"
+            widget: "text"
+            required: false
+          - label: "Meta / SEO"
+            name: "meta"
+            widget: "object"
+            collapsed: true
+            fields:
+              - label: "OG Kuva (someen)"
+                name: "og_image"
+                widget: "image"
+                required: false
+              - label: "Twitter / X käyttäjä"
+                name: "twitter"
+                widget: "string"
+                required: false
+          - label: "Analytiikka"
+            name: "analytics"
+            widget: "object"
+            collapsed: true
+            fields:
+              - label: "Google Analytics 4 -tunnus (varatunnus)"
+                name: "google"
+                widget: "string"
+                required: false
+                hint: "Käytetään jos Tietosuoja ja evästeet -osion GA4-järjestelmältä puuttuu tunnus. Seuranta ladataan vasta evästesuostumuksen jälkeen."
+          - label: "Teemavärit"
+            name: "theme"
+            widget: "object"
+            collapsed: false
+            hint: "Nämä värit vaikuttavat koko sivustoon. Riittää yleensä tausta, teksti, korostus ja reunat."
+            fields:
+              - label: "Sivun tausta"
+                name: "bg_color"
+                widget: "color"
+                allowInput: true
+                default: "#f3efe6"
+                hint: "Koko sivun tausta."
+              - label: "Pinta (kortit / lohkot)"
+                name: "surface_color"
+                widget: "color"
+                allowInput: true
+                default: "#fffcf6"
+                hint: "Kortit, lomakkeet, henkilökortit."
+              - label: "Teksti"
+                name: "primary_color"
+                widget: "color"
+                allowInput: true
+                default: "#1c2a24"
+                hint: "Otsikot ja leipäteksti."
+              - label: "Hillitty teksti"
+                name: "muted_color"
+                widget: "color"
+                allowInput: true
+                default: "#5d6b64"
+                hint: "Kuvaukset, tittelit, alatunnisteen pieni teksti."
+              - label: "Korostus (painikkeet, linkit)"
+                name: "accent_color"
+                widget: "color"
+                allowInput: true
+                default: "#0d6e5c"
+                hint: "CTA-painikkeet, linkit, aktiiviset tilat."
+              - label: "Teksti korostuksen päällä"
+                name: "accent_text_color"
+                widget: "color"
+                allowInput: true
+                default: "#ffffff"
+                hint: "Teksti accent-painikkeen päällä. Yleensä valkoinen."
+              - label: "Reunat"
+                name: "border_color"
+                widget: "color"
+                allowInput: true
+                default: "#d8d0c4"
+                hint: "Viivat, korttien reunat, lomakekentät."
+              - label: "Ylätunnisteen tausta"
+                name: "header_bg"
+                widget: "color"
+                allowInput: true
+                default: "#fffcf6"
+              - label: "Alatunnisteen tausta"
+                name: "footer_bg"
+                widget: "color"
+                allowInput: true
+                default: "#e7e0d4"
+          - label: "Yhteystiedot"
+            name: "contact"
+            widget: "object"
+            collapsed: true
+            fields:
+              - label: "Sähköposti"
+                name: "email"
+                widget: "string"
+                required: false
+              - label: "Puhelin"
+                name: "phone"
+                widget: "string"
+                required: false
+              - label: "Osoite"
+                name: "address"
+                widget: "text"
+                required: false
+          - label: "Valikko / Päänavigaatio"
+            name: "menu"
+            widget: "object"
+            collapsed: true
+            fields:
+              - label: "Näytä Tuotteet"
+                name: "products"
+                widget: "boolean"
+                default: true
+              - label: "Näytä Referenssit"
+                name: "references"
+                widget: "boolean"
+                default: true
+              - label: "Näytä Sivut"
+                name: "pages"
+                widget: "boolean"
+                default: true
+              - label: "Näytä Kampanjat"
+                name: "kampanjat"
+                widget: "boolean"
+                default: true
+          - label: "Sosiaalinen media"
+            name: "social"
+            widget: "object"
+            collapsed: true
+            fields:
+              - label: "Facebook"
+                name: "facebook"
+                widget: "string"
+                required: false
+              - label: "X (Twitter)"
+                name: "x"
+                widget: "string"
+                required: false
+              - label: "Instagram"
+                name: "instagram"
+                widget: "string"
+                required: false
+              - label: "YouTube"
+                name: "youtube"
+                widget: "string"
+                required: false
+
+  - name: "people"
+    label: "Henkilöt"
+    folder: "content/people"
+    create: true
+    slug: "{{slug}}"
+    summary: "{{title}} — {{role}}"
+    fields:
+      - label: "Nimi"
+        name: "title"
+        widget: "string"
+      - label: "Titteli"
+        name: "role"
+        widget: "string"
+        required: false
+        hint: "Esim. Myyntipäällikkö, Asentaja."
+      - label: "Kuva"
+        name: "image"
+        widget: "image"
+        required: false
+      - label: "Sähköposti"
+        name: "email"
+        widget: "string"
+        required: false
+      - label: "Puhelin"
+        name: "phone"
+        widget: "string"
+        required: false
+
+  - name: "manufacturers"
+    label: "Valmistajat"
+    folder: "content/manufacturers"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - label: "Nimi"
+        name: "title"
+        widget: "string"
+      - label: "Logo"
+        name: "logo"
+        widget: "image"
+        required: false
+      - label: "Linkki"
+        name: "link"
+        widget: "string"
+        required: false
+      - label: "Sisältö"
+        name: "body"
+        widget: "markdown"
+        required: false

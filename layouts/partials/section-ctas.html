@@ -1,0 +1,18 @@
+{{/* Renders a section's CTA list. With url → button; without → text. */}}
+{{ with . }}
+  <div class="section-ctas">
+    {{ range . }}
+      {{ $label := .label | default .text }}
+      {{ if $label }}
+        {{ $url := .url | default .link }}
+        {{ if $url }}
+          {{ $external := or (hasPrefix $url "http://") (hasPrefix $url "https://") }}
+          {{ $raw := or $external (hasPrefix $url "mailto:") (hasPrefix $url "tel:") (hasPrefix $url "#") }}
+          <a class="cta-button" href="{{ if $raw }}{{ $url | safeURL }}{{ else }}{{ $url | relURL }}{{ end }}"{{ if $external }} target="_blank" rel="noopener"{{ end }}>{{ $label }}</a>
+        {{ else }}
+          <span class="cta-text">{{ $label }}</span>
+        {{ end }}
+      {{ end }}
+    {{ end }}
+  </div>
+{{ end }}

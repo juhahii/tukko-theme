@@ -1,0 +1,10 @@
+name = "Tukko"
+license = "UNLICENSED"
+description = "Hugo + Decap theme for small Finnish business sites. Single content type (Tuote, Referenssi, Sivu, Kampanja), frontpage sections, people and manufacturer widgets."
+homepage = ""
+tags = ["business", "company", "finnish", "decap"]
+features = ["products", "references", "campaigns", "contact form", "cookie consent"]
+min_version = "0.123.0"
+
+[author]
+  name = ""

@@ -1,0 +1,53 @@
+{{ $site := .Site.Data.site | default dict }}
+{{ $siteMeta := $site.meta | default dict }}
+{{ $desc := "" }}
+{{ with .Params.description }}{{ $desc = . }}{{ end }}
+{{ if not $desc }}{{ with $site.description }}{{ $desc = . }}{{ end }}{{ end }}
+{{ if not $desc }}{{ with .Site.Params.description }}{{ $desc = . }}{{ end }}{{ end }}
+
+{{ $img := "" }}
+{{ with .Params.teaserImage }}{{ $img = . }}{{ end }}
+{{ if not $img }}
+  {{ with .Params.mainImages }}
+    {{ with index . 0 }}{{ with .image }}{{ $img = . }}{{ end }}{{ end }}
+  {{ end }}
+{{ end }}
+{{ if not $img }}{{ with $siteMeta.og_image }}{{ $img = . }}{{ end }}{{ end }}
+{{ if not $img }}{{ with $site.logo_large }}{{ $img = . }}{{ end }}{{ end }}
+
+{{ $imgAbs := "" }}
+{{ if $img }}
+  {{ if or (hasPrefix $img "http://") (hasPrefix $img "https://") }}
+    {{ $imgAbs = $img }}
+  {{ else }}
+    {{ $imgAbs = $img | absURL }}
+  {{ end }}
+{{ end }}
+
+{{ $fullTitle := .Title }}
+{{ if not .IsHome }}{{ $fullTitle = printf "%s | %s" .Title .Site.Title }}{{ end }}
+{{ if .IsHome }}{{ $fullTitle = .Site.Title }}{{ end }}
+
+{{ with $desc }}<meta name="description" content="{{ . }}">{{ end }}
+<link rel="canonical" href="{{ .Permalink }}">
+
+<meta property="og:site_name" content="{{ .Site.Title }}">
+<meta property="og:type" content="{{ if .IsHome }}website{{ else }}article{{ end }}">
+<meta property="og:locale" content="fi_FI">
+<meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:title" content="{{ $fullTitle }}">
+{{ with $desc }}<meta property="og:description" content="{{ . }}">{{ end }}
+{{ with $imgAbs }}<meta property="og:image" content="{{ . }}">{{ end }}
+
+<meta name="twitter:card" content="{{ if $imgAbs }}summary_large_image{{ else }}summary{{ end }}">
+{{ with $siteMeta.twitter }}<meta name="twitter:site" content="{{ . }}">{{ end }}
+<meta name="twitter:title" content="{{ $fullTitle }}">
+{{ with $desc }}<meta name="twitter:description" content="{{ . }}">{{ end }}
+{{ with $imgAbs }}<meta name="twitter:image" content="{{ . }}">{{ end }}
+
+{{ $path := .RelPermalink }}
+{{ if or (eq .Kind "taxonomy") (eq .Kind "term") (eq .Section "people") (eq .Section "manufacturers") (hasPrefix $path "/content/") (eq $path "/content/") (hasPrefix $path "/admin/") }}
+<meta name="robots" content="noindex, nofollow">
+{{ end }}
+
+{{ partial "jsonld.html" . }}

@@ -1,0 +1,25 @@
+<form name="contact" method="POST" data-netlify="true" class="contact-form">
+  <input type="hidden" name="form-name" value="contact" />
+  <p class="hidden">
+    <label>Älä täytä tätä jos olet ihminen: <input name="bot-field" /></label>
+  </p>
+
+  <p>
+    <label for="cf-email">Sähköposti</label>
+    <input type="email" id="cf-email" name="email" required />
+  </p>
+
+  <p>
+    <label for="cf-message">Viesti</label>
+    <textarea id="cf-message" name="message" rows="5" required></textarea>
+  </p>
+
+  <p class="form-privacy-note">
+    Lähettämällä lomakkeen sähköpostiosoitteesi ja viestisi tallennetaan
+    <strong>Netlify Formsiin</strong> yhteydenottoon vastaamiseksi.
+    Tämä ei ole seurantaeäste — lomake toimii ilman analytiikkasuostumusta.
+    <a href="{{ "/sivut/tietosuoja/" | relURL }}">Tietosuojaseloste</a>
+  </p>
+
+  <button type="submit">Lähetä</button>
+</form>

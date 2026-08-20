@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Sisällönhallinta</title>
+  </head>
+  <body>
+    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    <script>
+      (function () {
+        var PREFIX = {
+          Tuote: 'tuotteet',
+          Referenssi: 'referenssit',
+          Sivu: 'sivut',
+          Kampanja: 'kampanjat'
+        };
+        var AUTO = /\/(tuotteet|referenssit|sivut|kampanjat)\/[^/]+\/?$/;
+
+        function slugify(str) {
+          return String(str || '')
+            .trim()
+            .toLowerCase()
+            .replace(/[äÄ]/g, 'a')
+            .replace(/[öÖ]/g, 'o')
+            .replace(/[åÅ]/g, 'a')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+        }
+
+        function publicUrl(type, slug) {
+          var prefix = PREFIX[type] || 'sivut';
+          var s = String(slug || '').replace(/^\/+|\/+$/g, '');
+          return '/' + prefix + '/' + s + '/';
+        }
+
+        CMS.registerEventListener({
+          name: 'preSave',
+          handler: function (event) {
+            var entry = event.entry;
+            if (!entry || typeof entry.get !== 'function') return entry;
+
+            var data = entry.get('data') || entry;
+            if (!data || typeof data.get !== 'function') return data;
+
+            var type = data.get('content_type') || 'Sivu';
+            var title = data.get('title') || '';
+            var current = data.get('url') || '';
+            var slug = entry.get('slug') || slugify(title);
+            slug = String(slug).replace(/^.*\//, '').replace(/\.md$/, '');
+            if (!slug) return data;
+
+            var next = publicUrl(type, slug);
+            var shouldSet = !current || AUTO.test(String(current));
+            if (!shouldSet) return data;
+            return data.set('url', next);
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

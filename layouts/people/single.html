@@ -1,0 +1,10 @@
+{{ define "main" }}
+<article class="person-single">
+  {{ $key := .Slug }}
+  {{ with .File }}{{ $key = .BaseFileName }}{{ end }}
+  {{ partial "people-widget.html" (slice $key) }}
+  {{ with .Content }}
+    <div class="content">{{ . }}</div>
+  {{ end }}
+</article>
+{{ end }}

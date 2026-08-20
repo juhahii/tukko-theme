@@ -1,0 +1,33 @@
+{{ define "main" }}
+{{ $fp := .Site.Data.frontpage }}
+
+{{/* Build list of sections so their order can be controlled via the "order" field in data/frontpage.yaml (or Decap CMS) */}}
+{{ $sectionDefs := slice }}
+{{ $sectionDefs = $sectionDefs | append (dict "config" ($fp.welcome | default dict) "landing" true "slug" "tervetuloa") }}
+{{ $sectionDefs = $sectionDefs | append (dict "config" ($fp.about | default dict) "landing" true "slug" "tietoa") }}
+{{ $sectionDefs = $sectionDefs | append (dict "config" ($fp.products | default dict) "contentType" "Tuote" "ptype" "product" "slug" "tuotteet") }}
+{{ $sectionDefs = $sectionDefs | append (dict "config" ($fp.references | default dict) "contentType" "Referenssi" "ptype" "reference" "slug" "referenssit") }}
+{{ $sectionDefs = $sectionDefs | append (dict "config" ($fp.pages | default dict) "contentType" "Sivu" "ptype" "page" "slug" "sivut") }}
+{{ $sectionDefs = $sectionDefs | append (dict "config" ($fp.kampanjat | default dict) "contentType" "Kampanja" "ptype" "kampanja" "slug" "kampanjat") }}
+{{ $sectionDefs = $sectionDefs | append (dict "config" ($fp.people | default dict) "widget" "people" "ptype" "people" "slug" "henkilot") }}
+{{ $sectionDefs = $sectionDefs | append (dict "config" ($fp.manufacturers | default dict) "widget" "manufacturers" "ptype" "manufacturers" "slug" "valmistajat") }}
+{{ $sectionDefs = $sectionDefs | append (dict "config" ($fp.contactForm | default dict) "widget" "contact" "ptype" "contact" "slug" "yhteystiedot") }}
+
+{{ $enabledSections := slice }}
+{{ range $sectionDefs }}
+  {{ $cfg := .config }}
+  {{ if $cfg.enabled | default true }}
+    {{ $enabledSections = $enabledSections | append . }}
+  {{ end }}
+{{ end }}
+
+{{ range sort $enabledSections "config.order" }}
+  {{ $sec := . }}
+  {{ $items := slice }}
+  {{ if and (not $sec.landing) (not $sec.widget) }}
+    {{ $limit := $sec.config.limit | default 3 }}
+    {{ $items = where (where site.RegularPages "Params.content_type" $sec.contentType) "Params.featureInFrontpage" true | first $limit }}
+  {{ end }}
+  {{ partial "frontpage-section.html" (dict "items" $items "config" $sec.config "type" ($sec.ptype | default "landing") "slug" $sec.slug "landing" $sec.landing "widget" $sec.widget) }}
+{{ end }}
+{{ end }}

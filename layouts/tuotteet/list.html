@@ -1,0 +1,20 @@
+{{ define "main" }}
+{{ if not (partial "show-subpages.html" "products") }}
+  {{ partial "hidden-section.html" . }}
+{{ else }}
+  {{ $cfg := site.Data.frontpage.products | default dict }}
+  <h2>{{ $cfg.title | default "Tuotteet" }}</h2>
+  {{ with $cfg.content }}<div class="section-content">{{ . | markdownify }}</div>{{ end }}
+  {{ partial "section-ctas.html" $cfg.ctas }}
+  {{ $items := where .Site.RegularPages "Params.content_type" "Tuote" }}
+  {{ if $items }}
+    <div class="list-stack">
+      {{ range $items }}
+        {{ partial "list-item.html" (dict "item" . "type" "product") }}
+      {{ end }}
+    </div>
+  {{ else }}
+    <p>Ei tuotteita vielä.</p>
+  {{ end }}
+{{ end }}
+{{ end }}

@@ -1,0 +1,78 @@
+{{ $items := .items }}
+{{ $slug := .slug | default "gallery" }}
+{{ $gallery := slice }}
+
+{{ range $items }}
+  {{ $page := . }}
+  {{ $hasMain := false }}
+  {{ with $page.Params.mainImages }}
+    {{ range . }}
+      {{ if .image }}
+        {{ $hasMain = true }}
+        {{ $gallery = $gallery | append (dict
+          "src" .image
+          "caption" (.caption | default "")
+          "title" $page.Title
+          "description" ($page.Params.description | default "")
+          "url" $page.RelPermalink
+        ) }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+  {{ if and (not $hasMain) $page.Params.teaserImage }}
+    {{ $gallery = $gallery | append (dict
+      "src" $page.Params.teaserImage
+      "caption" ""
+      "title" $page.Title
+      "description" ($page.Params.description | default "")
+      "url" $page.RelPermalink
+    ) }}
+  {{ end }}
+{{ end }}
+
+{{ if $gallery }}
+{{ $gid := printf "gallery-%s" $slug }}
+<div class="image-grid" data-gallery="{{ $gid }}">
+  {{ range $i, $img := $gallery }}
+    <button type="button" class="image-grid-cell" data-index="{{ $i }}" aria-label="{{ $img.title }}">
+      <img src="{{ $img.src | relURL }}" alt="{{ $img.title }}{{ with $img.caption }} — {{ . }}{{ end }}">
+    </button>
+  {{ end }}
+</div>
+
+<div class="gallery-lightbox" id="{{ $gid }}" hidden role="dialog" aria-modal="true" aria-label="Kuvagalleria">
+  <button type="button" class="gallery-close" aria-label="Sulje">&times;</button>
+
+  <div class="gallery-stage">
+    <div class="swiper gallery-swiper-main">
+      <div class="swiper-wrapper">
+        {{ range $gallery }}
+          <div class="swiper-slide">
+            <div class="gallery-slide-inner">
+              <img src="{{ .src | relURL }}" alt="{{ .title }}">
+              <a class="gallery-meta" href="{{ .url }}">
+                <h3>{{ .title }}</h3>
+                {{ with .description }}<p>{{ . }}</p>{{ end }}
+                {{ with .caption }}<span class="gallery-caption">{{ . }}</span>{{ end }}
+                <span class="gallery-more">Lue lisää →</span>
+              </a>
+            </div>
+          </div>
+        {{ end }}
+      </div>
+    </div>
+  </div>
+
+  <div class="gallery-thumbs-wrap">
+    <div class="swiper gallery-swiper-thumbs">
+      <div class="swiper-wrapper">
+        {{ range $gallery }}
+          <div class="swiper-slide">
+            <img src="{{ .src | relURL }}" alt="">
+          </div>
+        {{ end }}
+      </div>
+    </div>
+  </div>
+</div>
+{{ end }}

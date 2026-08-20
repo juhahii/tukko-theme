@@ -1,0 +1,26 @@
+{{ $imageLeft := .imageLeft }}
+{{ range .items }}
+  {{ $page := . }}
+  {{ $img := $page.Params.teaserImage }}
+  {{ if not $img }}
+    {{ with $page.Params.mainImages }}
+      {{ with index . 0 }}{{ $img = .image }}{{ end }}
+    {{ end }}
+  {{ end }}
+  <a class="featured-split{{ if $img }} featured-split--with-image landing-section--with-image{{ if $imageLeft }} featured-split--image-left{{ end }}{{ end }}" href="{{ $page.RelPermalink }}">
+    <div class="landing-copy">
+      <h2 class="featured-split-title">{{ $page.Title }}</h2>
+      {{ with $page.Params.description }}
+        <div class="section-content"><p>{{ . }}</p></div>
+      {{ end }}
+      <div class="section-ctas">
+        <span class="cta-button">Lue lisää →</span>
+      </div>
+    </div>
+    {{ with $img }}
+      <div class="landing-media">
+        <img src="{{ . | relURL }}" alt="{{ $page.Title }}">
+      </div>
+    {{ end }}
+  </a>
+{{ end }}

@@ -1,0 +1,38 @@
+{{ $images := slice }}
+{{ with .Params.mainImages }}
+  {{ range . }}{{ if .image }}{{ $images = $images | append . }}{{ end }}{{ end }}
+{{ end }}
+{{ if and (not $images) .Params.teaserImage }}
+  {{ $images = $images | append (dict "image" .Params.teaserImage "caption" "") }}
+{{ end }}
+{{ if $images }}
+<div class="media-gallery">
+  <div class="swiper swiper-media-main">
+    <div class="swiper-wrapper">
+      {{ range $images }}
+      <div class="swiper-slide">
+        <figure class="media-slide">
+          <img src="{{ .image | relURL }}" alt="{{ $.Title }}{{ with .caption }} — {{ . }}{{ end }}">
+          {{ with .caption }}<figcaption>{{ . }}</figcaption>{{ end }}
+        </figure>
+      </div>
+      {{ end }}
+    </div>
+    {{ if gt (len $images) 1 }}
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
+    {{ end }}
+  </div>
+  {{ if gt (len $images) 1 }}
+  <div class="swiper swiper-media-thumbs">
+    <div class="swiper-wrapper">
+      {{ range $images }}
+      <div class="swiper-slide">
+        <img src="{{ .image | relURL }}" alt="">
+      </div>
+      {{ end }}
+    </div>
+  </div>
+  {{ end }}
+</div>
+{{ end }}

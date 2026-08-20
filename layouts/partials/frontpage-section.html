@@ -1,0 +1,120 @@
+{{ $items := .items }}
+{{ $config := .config }}
+{{ $type := .type }}
+{{ $slug := .slug | default $type }}
+{{ $landing := .landing }}
+{{ $widget := .widget }}
+{{ $showSub := and (not $landing) (not $widget) ($config.showSubPages | default true) }}
+{{ $image := $config.image }}
+{{ $showHeading := $config.showHeading | default true }}
+{{ $listUrl := "" }}
+{{ if and $showSub (not $landing) (not $widget) }}
+  {{ if eq $type "product" }}{{ $listUrl = "/tuotteet/" }}
+  {{ else if eq $type "reference" }}{{ $listUrl = "/referenssit/" }}
+  {{ else if eq $type "kampanja" }}{{ $listUrl = "/kampanjat/" }}
+  {{ else if eq $type "page" }}{{ $listUrl = "/sivut/" }}
+  {{ end }}
+{{ end }}
+
+<section class="frontpage-section{{ if $landing }} landing-section{{ end }}{{ if $image }} landing-section--with-image{{ end }}" id="osio-{{ $slug }}">
+  {{ if or $landing $image }}
+    <div class="landing-copy">
+      {{ if and $showHeading $config.title }}
+        <h2>{{ if $listUrl }}<a class="section-title-link" href="{{ $listUrl }}">{{ $config.title }}</a>{{ else }}{{ $config.title }}{{ end }}</h2>
+      {{ end }}
+      {{ with $config.content }}
+        <div class="section-content">{{ . | markdownify }}</div>
+      {{ end }}
+      {{ partial "section-ctas.html" $config.ctas }}
+    </div>
+    {{ with $image }}
+      <div class="landing-media">
+        <img src="{{ . | relURL }}" alt="{{ $config.title }}">
+      </div>
+    {{ end }}
+  {{ else }}
+    {{ if and $showHeading $config.title }}
+      <h2>{{ if $listUrl }}<a class="section-title-link" href="{{ $listUrl }}">{{ $config.title }}</a>{{ else }}{{ $config.title }}{{ end }}</h2>
+    {{ end }}
+    {{ with $config.content }}
+      <div class="section-content">{{ . | markdownify }}</div>
+    {{ end }}
+    {{ partial "section-ctas.html" $config.ctas }}
+  {{ end }}
+
+  {{ if eq $widget "people" }}
+    {{ partial "people-widget.html" $config.members }}
+  {{ else if eq $widget "manufacturers" }}
+    {{ partial "manufacturers-widget.html" (dict "members" $config.members "showTitles" $config.showTitles) }}
+  {{ else if eq $widget "contact" }}
+    {{ partial "contact-form.html" . }}
+  {{ else if $showSub }}
+    {{ if or (eq $config.display "featured-split") (eq $config.display "featured-split-left") }}
+      {{ partial "featured-split.html" (dict "items" $items "imageLeft" (eq $config.display "featured-split-left")) }}
+    {{ else if eq $config.display "image-grid" }}
+      {{ partial "image-grid.html" (dict "items" $items "slug" $slug) }}
+    {{ else if or (eq $config.display "carousel-cards") (eq $config.display "carousel-poster") }}
+      {{ $showNav := $config.showNavigation | default true }}
+      {{ $isPoster := eq $config.display "carousel-poster" }}
+      {{ if not $isPoster }}<div class="swiper-cards-wrap">{{ end }}
+      <div class="swiper {{ if $isPoster }}swiper-poster{{ else }}swiper-cards{{ end }}" data-show-navigation="{{ if $showNav }}true{{ else }}false{{ end }}">
+        <div class="swiper-wrapper">
+          {{ range $items }}
+            <div class="swiper-slide">
+              {{ if $isPoster }}
+                <a href="{{ .RelPermalink }}" class="poster-slide" style="background-image: url('{{ .Params.teaserImage | relURL }}')">
+                  <div class="poster-overlay">
+                    <h3>{{ .Title }}</h3>
+                    {{ with .Params.description }}<p>{{ . }}</p>{{ end }}
+                    <span class="cta">Lue lisää →</span>
+                  </div>
+                </a>
+              {{ else }}
+                {{ partial "featured-item.html" (dict "item" . "type" $type "mode" "card") }}
+              {{ end }}
+            </div>
+          {{ end }}
+        </div>
+        {{ if and $showNav $isPoster }}
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+        {{ end }}
+      </div>
+      {{ if and $showNav (not $isPoster) }}
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+      {{ end }}
+      {{ if not $isPoster }}</div>{{ end }}
+    {{ else if eq $config.display "list" }}
+      <div class="list-stack">
+        {{ range $items }}
+          {{ partial "list-item.html" (dict "item" . "type" $type) }}
+        {{ end }}
+      </div>
+    {{ else if eq $config.display "cards" }}
+      <div class="cards-grid">
+        {{ range $items }}
+          {{ partial "featured-item.html" (dict "item" . "type" $type "mode" "card") }}
+        {{ end }}
+      </div>
+    {{ else }}
+      <ul class="simple-list">
+        {{ range $items }}
+          <li>
+            <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+            {{ if eq $type "product" }}{{ with .Params.price }} — {{ . }}{{ end }}{{ end }}
+            {{ if eq $type "reference" }}
+              {{ with .Params.usedProduct }}
+                {{ $product := partial "rel-by-slug.html" (dict "pages" (where site.RegularPages "Params.content_type" "Tuote") "key" .) }}
+                ({{ if $product }}{{ $product.Title }}{{ else }}{{ . }}{{ end }})
+              {{ end }}
+            {{ end }}
+            {{ if or (eq $type "page") (eq $type "kampanja") }} — {{ .Params.description }}{{ end }}
+          </li>
+        {{ end }}
+      </ul>
+    {{ end }}
+
+  {{ end }}
+</section>

@@ -1,0 +1,62 @@
+{{ $consent := site.Data.consent | default dict }}
+{{ $gaFallback := "" }}
+{{ with site.Data.site.analytics }}{{ with .google }}{{ $gaFallback = . }}{{ end }}{{ end }}
+{{ $systems := slice }}
+{{ range $consent.systems }}
+  {{ if .enabled | default true }}
+    {{ $mid := .measurementId | default "" }}
+    {{ if and (eq .type "ga4") (not $mid) }}{{ $mid = $gaFallback }}{{ end }}
+    {{ $systems = $systems | append (dict
+      "id" (.id | default "")
+      "name" (.name | default "")
+      "purpose" (.purpose | default "")
+      "required" (.required | default false)
+      "category" (.category | default "analytics")
+      "type" (.type | default "none")
+      "measurementId" $mid
+      "scriptSrc" (.scriptSrc | default "")
+      "inBanner" (.inBanner | default true)
+    ) }}
+  {{ end }}
+{{ end }}
+{{ $privacy := "/sivut/tietosuoja/" }}
+<script type="application/json" id="tukko-consent-config">{{ dict "privacyUrl" $privacy "systems" $systems | jsonify | safeHTML }}</script>
+
+<div id="cookie-banner" class="cookie-banner" hidden>
+  <div class="cookie-banner-inner">
+    <div class="cookie-banner-copy">
+      <p class="cookie-banner-title">{{ $consent.bannerTitle | default "Evästeet" }}</p>
+      <p>{{ $consent.bannerText | default "Käytämme evästeitä sivuston toimintaan ja, suostumuksellasi, analytiikkaan." }}</p>
+      <p class="cookie-banner-privacy"><a href="{{ $privacy | relURL }}">Tietosuojaseloste</a></p>
+    </div>
+    <div class="cookie-banner-actions">
+      <button type="button" class="cta-button" data-consent="all">Hyväksy kaikki</button>
+      <button type="button" class="cookie-btn-secondary" data-consent="necessary">Vain välttämättömät</button>
+      <button type="button" class="cookie-btn-secondary" data-consent="customize">Asetukset</button>
+    </div>
+  </div>
+</div>
+
+<div id="cookie-settings" class="cookie-settings" hidden>
+  <div class="cookie-settings-panel" role="dialog" aria-labelledby="cookie-settings-title">
+    <h2 id="cookie-settings-title">Evästeasetukset</h2>
+    <div class="cookie-settings-list">
+      {{ range $systems }}
+        {{ if and .id (.inBanner | default true) }}
+        <label class="cookie-setting">
+          <input type="checkbox" data-system="{{ .id }}"{{ if .required }} checked disabled{{ end }}>
+          <span>
+            <strong>{{ .name }}</strong>
+            {{ if .required }}<span class="cookie-req">Pakollinen</span>{{ end }}
+            {{ with .purpose }}<span class="cookie-purpose">{{ . }}</span>{{ end }}
+          </span>
+        </label>
+        {{ end }}
+      {{ end }}
+    </div>
+    <div class="cookie-banner-actions">
+      <button type="button" class="cta-button" data-consent="save">Tallenna</button>
+      <button type="button" class="cookie-btn-secondary" data-consent="close-settings">Peruuta</button>
+    </div>
+  </div>
+</div>

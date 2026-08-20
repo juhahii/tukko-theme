@@ -1,0 +1,39 @@
+{{/* Argument: optional person slugs (string or list). Empty/nil → all people. */}}
+{{ $names := . }}
+{{ if and $names (not (reflect.IsSlice $names)) }}
+  {{ $names = slice $names }}
+{{ end }}
+{{ $all := where site.RegularPages "Section" "people" }}
+{{ $items := $all }}
+{{ if $names }}
+  {{ $items = slice }}
+  {{ range $names }}
+    {{ $match := partial "rel-by-slug.html" (dict "pages" $all "key" .) }}
+    {{ if $match }}{{ $items = $items | append $match }}{{ end }}
+  {{ end }}
+{{ end }}
+
+{{ if $items }}
+<div class="people-widget">
+  {{ range $items }}
+    <article class="person-card">
+      {{ if .Params.image }}
+        <img class="person-photo" src="{{ .Params.image | relURL }}" alt="{{ .Title }}">
+      {{ else }}
+        <div class="person-avatar" aria-hidden="true">{{ substr .Title 0 1 }}</div>
+      {{ end }}
+      <h3 class="person-name">{{ .Title }}</h3>
+      {{ with .Params.role }}<p class="person-role">{{ . }}</p>{{ end }}
+      <p class="person-contacts">
+        {{ with .Params.email }}
+          <a href="{{ printf "mailto:%s" . | safeURL }}">{{ . }}</a>
+        {{ end }}
+        {{ with .Params.phone }}
+          {{ $tel := replace . " " "" }}
+          <a href="{{ printf "tel:%s" $tel | safeURL }}">{{ . }}</a>
+        {{ end }}
+      </p>
+    </article>
+  {{ end }}
+</div>
+{{ end }}

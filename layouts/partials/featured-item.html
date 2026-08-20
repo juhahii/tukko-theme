@@ -1,0 +1,46 @@
+{{ $item := .item }}
+{{ $mode := .mode | default "" }}
+
+{{ if eq $mode "card" }}
+<a href="{{ $item.RelPermalink }}" class="card">
+  {{ with $item.Params.teaserImage }}
+    <img src="{{ . | relURL }}" alt="{{ $item.Title }}" class="teaser-img">
+  {{ end }}
+  <div class="card-body">
+    <h4 style="margin:0 0 0.3rem;">{{ $item.Title }}</h4>
+    {{ with $item.Params.description }}
+      <p class="card-desc">{{ . }}</p>
+    {{ end }}
+    {{ if eq .type "product" }}
+      {{ with $item.Params.price }}
+        <strong class="card-price">{{ . }}</strong>
+      {{ end }}
+    {{ else if eq .type "reference" }}
+      {{ with $item.Params.usedProduct }}
+        {{ $product := partial "rel-by-slug.html" (dict "pages" (where site.RegularPages "Params.content_type" "Tuote") "key" .) }}
+        <small>Käytetty: {{ if $product }}{{ $product.Title }}{{ else }}{{ . }}{{ end }}</small>
+      {{ end }}
+    {{ end }}
+  </div>
+</a>
+{{ else }}
+<div class="item">
+  {{ with $item.Params.teaserImage }}
+    <img src="{{ . | relURL }}" alt="{{ $item.Title }}" class="teaser-img">
+  {{ end }}
+  <h4 style="margin:0 0 0.3rem;"><a href="{{ $item.RelPermalink }}">{{ $item.Title }}</a></h4>
+  {{ with $item.Params.description }}
+    <p class="card-desc">{{ . }}</p>
+  {{ end }}
+  {{ if eq .type "product" }}
+    {{ with $item.Params.price }}
+      <strong class="card-price">{{ . }}</strong>
+    {{ end }}
+  {{ else if eq .type "reference" }}
+    {{ with $item.Params.usedProduct }}
+      {{ $product := partial "rel-by-slug.html" (dict "pages" (where site.RegularPages "Params.content_type" "Tuote") "key" .) }}
+      <small>Käytetty: {{ if $product }}{{ $product.Title }}{{ else }}{{ . }}{{ end }}</small>
+    {{ end }}
+  {{ end }}
+</div>
+{{ end }}

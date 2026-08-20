@@ -1,0 +1,38 @@
+{{/* Dict: members (optional slugs), showTitles (bool). Or a bare list of slugs. */}}
+{{ $names := . }}
+{{ $showTitles := false }}
+{{ if reflect.IsMap . }}
+  {{ $names = .members }}
+  {{ $showTitles = .showTitles | default false }}
+{{ end }}
+{{ if and $names (not (reflect.IsSlice $names)) }}
+  {{ $names = slice $names }}
+{{ end }}
+{{ $all := where site.RegularPages "Section" "manufacturers" }}
+{{ $items := $all }}
+{{ if $names }}
+  {{ $items = slice }}
+  {{ range $names }}
+    {{ $match := partial "rel-by-slug.html" (dict "pages" $all "key" .) }}
+    {{ if $match }}{{ $items = $items | append $match }}{{ end }}
+  {{ end }}
+{{ end }}
+
+{{ if $items }}
+<div class="manufacturers-widget">
+  {{ range $items }}
+    {{ $href := .Params.link | default .RelPermalink }}
+    {{ $external := or (hasPrefix $href "http://") (hasPrefix $href "https://") }}
+    <a class="manufacturer-card" href="{{ if $external }}{{ $href | safeURL }}{{ else }}{{ $href | relURL }}{{ end }}"{{ if $external }} target="_blank" rel="noopener"{{ end }}>
+      {{ if $showTitles }}
+        <span class="manufacturer-name">{{ .Title }}</span>
+      {{ end }}
+      {{ if .Params.logo }}
+        <img class="manufacturer-logo" src="{{ .Params.logo | relURL }}" alt="{{ .Title }}">
+      {{ else if not $showTitles }}
+        <span class="manufacturer-name">{{ .Title }}</span>
+      {{ end }}
+    </a>
+  {{ end }}
+</div>
+{{ end }}

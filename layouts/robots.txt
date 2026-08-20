@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /content/
+Disallow: /people/
+Disallow: /manufacturers/
+Disallow: /categories/
+Disallow: /tags/
+
+Sitemap: {{ "sitemap.xml" | absURL }}

@@ -1,0 +1,47 @@
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="logo">
+      {{ if .IsHome }}
+        {{ with .Site.Data.site.logo_large }}
+          <img src="{{ . | relURL }}" alt="{{ $.Site.Title }}" class="logo-large">
+        {{ else }}
+          <span class="logo-text">{{ $.Site.Title }}</span>
+        {{ end }}
+      {{ else }}
+        {{ with .Site.Data.site.logo_small }}
+          <img src="{{ . | relURL }}" alt="{{ $.Site.Title }}" class="logo-small">
+        {{ else }}
+          <span class="logo-text">{{ $.Site.Title }}</span>
+        {{ end }}
+      {{ end }}
+    </a>
+
+    <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="main-nav" aria-label="Avaa valikko">
+      <span class="nav-toggle-bar"></span>
+      <span class="nav-toggle-bar"></span>
+      <span class="nav-toggle-bar"></span>
+    </button>
+
+    <nav class="main-nav" id="main-nav">
+      {{ range sort (where .Site.RegularPages "Params.showInMenu" true) "Title" }}
+        <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+      {{ end }}
+      {{ $menu := .Site.Data.site.menu | default (dict "products" true "references" true "pages" true "kampanjat" true) }}
+      {{ if and $menu.products (partial "show-subpages.html" "products") }}<a href="/tuotteet/">Tuotteet</a>{{ end }}
+      {{ if and $menu.references (partial "show-subpages.html" "references") }}<a href="/referenssit/">Referenssit</a>{{ end }}
+      {{ if and $menu.pages (partial "show-subpages.html" "pages") }}<a href="/sivut/">Sivut</a>{{ end }}
+      {{ if and $menu.kampanjat (partial "show-subpages.html" "kampanjat") }}<a href="/kampanjat/">Kampanjat</a>{{ end }}
+    </nav>
+  </div>
+</header>
+<script>
+  (function () {
+    var btn = document.querySelector('.nav-toggle');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      var open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+      btn.setAttribute('aria-label', open ? 'Avaa valikko' : 'Sulje valikko');
+    });
+  })();
+</script>

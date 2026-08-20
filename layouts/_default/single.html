@@ -1,0 +1,106 @@
+{{ define "main" }}
+{{ $ct := .Params.content_type | default "Sivu" }}
+{{ $tpl := .Params.page_template | default "default" }}
+{{ $useProduct := false }}
+{{ if eq $tpl "product" }}
+  {{ $useProduct = true }}
+{{ else if eq $tpl "simple" }}
+  {{ $useProduct = false }}
+{{ else }}
+  {{ $useProduct = eq $ct "Tuote" }}
+{{ end }}
+
+{{ if $useProduct }}
+<article class="product-page">
+  <div class="product-hero">
+    {{ partial "content-gallery.html" . }}
+    <div class="product-summary">
+      {{ with .Params.manufacturer }}
+        {{ $manuf := partial "rel-by-slug.html" (dict "pages" (where site.RegularPages "Section" "manufacturers") "key" .) }}
+        {{ if and $manuf $manuf.Params.logo }}
+          <a class="product-brand" href="{{ $manuf.Params.link | default $manuf.RelPermalink }}"{{ if $manuf.Params.link }} target="_blank" rel="noopener"{{ end }}>
+            <img src="{{ $manuf.Params.logo | relURL }}" alt="{{ $manuf.Title }}">
+          </a>
+        {{ else }}
+          <p class="product-brand-name">{{ if $manuf }}{{ $manuf.Title }}{{ else }}{{ . }}{{ end }}</p>
+        {{ end }}
+      {{ end }}
+
+      <h1>{{ .Title }}</h1>
+      {{ with .Params.description }}<p class="product-lead">{{ . }}</p>{{ end }}
+
+      {{ with .Params.price }}
+        <p class="product-price">{{ . }}</p>
+      {{ end }}
+
+      {{ with .Params.features }}
+      <div class="product-features">
+        <h2>Tärkeimmät ominaisuudet</h2>
+        <ul>
+          {{ range . }}
+          <li><span class="feature-mark" aria-hidden="true"></span>{{ . }}</li>
+          {{ end }}
+        </ul>
+      </div>
+      {{ end }}
+
+      <div class="product-actions">
+        {{ with .Params.moreInfoLink }}
+          <a class="cta-button" href="{{ . }}" target="_blank" rel="noopener">Lisätietoja →</a>
+        {{ end }}
+      </div>
+    </div>
+  </div>
+
+  {{ with .Content }}
+  <div class="product-body content">
+    {{ . }}
+  </div>
+  {{ end }}
+{{ else }}
+<article class="simple-page">
+  <header class="simple-header">
+    <h1>{{ .Title }}</h1>
+    {{ with .Params.description }}<p class="simple-lead">{{ . }}</p>{{ end }}
+    {{ if eq $ct "Referenssi" }}
+      {{ with .Params.usedProduct }}
+        {{ $product := partial "rel-by-slug.html" (dict "pages" (where site.RegularPages "Params.content_type" "Tuote") "key" .) }}
+        <p class="simple-meta">
+          {{ if $product }}Käytetty tuote: <a href="{{ $product.RelPermalink }}">{{ $product.Title }}</a>
+          {{ else }}Käytetty tuote: {{ . }}{{ end }}
+        </p>
+      {{ end }}
+    {{ end }}
+  </header>
+
+  {{ partial "content-gallery.html" . }}
+
+  {{ with .Content }}
+  <div class="simple-body content">
+    {{ . }}
+  </div>
+  {{ end }}
+{{ end }}
+
+  {{ if or .Params.showPeople .Params.people }}
+  <div class="people-widget-wrapper">
+    <h2>Yhteyshenkilöt</h2>
+    {{ partial "people-widget.html" .Params.people }}
+  </div>
+  {{ end }}
+
+  {{ if or .Params.showManufacturers .Params.manufacturers }}
+  <div class="manufacturers-widget-wrapper">
+    {{ with .Params.manufacturersTitle }}<h2>{{ . }}</h2>{{ end }}
+    {{ partial "manufacturers-widget.html" (dict "members" .Params.manufacturers "showTitles" .Params.showManufacturerTitles) }}
+  </div>
+  {{ end }}
+
+  {{ if .Params.showContactForm }}
+  <div class="contact-form-wrapper">
+    <h2>Ota yhteyttä</h2>
+    {{ partial "contact-form.html" . }}
+  </div>
+  {{ end }}
+</article>
+{{ end }}

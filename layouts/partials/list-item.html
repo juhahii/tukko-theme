@@ -1,0 +1,24 @@
+{{ $item := .item }}
+{{ $type := .type | default "" }}
+<div class="list-item">
+  {{ with $item.Params.teaserImage }}
+    <a class="list-item-media" href="{{ $item.RelPermalink }}">
+      <img src="{{ . | relURL }}" alt="{{ $item.Title }}">
+    </a>
+  {{ end }}
+  <div class="list-item-body">
+    <h3 class="list-item-title"><a href="{{ $item.RelPermalink }}">{{ $item.Title }}</a></h3>
+    {{ with $item.Params.description }}<p class="list-item-desc">{{ . }}</p>{{ end }}
+    {{ if eq $type "product" }}
+      {{ with $item.Params.price }}<p class="list-item-meta card-price">{{ . }}</p>{{ end }}
+    {{ else if eq $type "reference" }}
+      {{ with $item.Params.usedProduct }}
+        {{ $product := partial "rel-by-slug.html" (dict "pages" (where site.RegularPages "Params.content_type" "Tuote") "key" .) }}
+        <p class="list-item-meta">
+          {{ if $product }}Käytetty: <a href="{{ $product.RelPermalink }}">{{ $product.Title }}</a>
+          {{ else }}Käytetty: {{ . }}{{ end }}
+        </p>
+      {{ end }}
+    {{ end }}
+  </div>
+</div>

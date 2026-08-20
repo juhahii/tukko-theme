@@ -1,0 +1,4 @@
+{{ define "main" }}
+<h2>{{ .Title | default "Henkilöt" }}</h2>
+{{ partial "people-widget.html" false }}
+{{ end }}

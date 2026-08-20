@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {{ partial "meta.html" . }}
+  <title>{{ block "title" . }}{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} | {{ .Site.Title }}{{ end }}{{ end }}</title>
+  {{ with .Site.Data.site.favicon }}
+  <link rel="icon" href="{{ . | relURL }}">
+  {{ end }}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  {{ $theme := .Site.Data.site.theme | default dict }}
+  <style>
+    :root {
+      --color-bg: {{ $theme.bg_color | default "#f3efe6" }};
+      --color-surface: {{ $theme.surface_color | default "#fffcf6" }};
+      --color-text: {{ $theme.primary_color | default "#1c2a24" }};
+      --color-primary: var(--color-text);
+      --color-muted: {{ $theme.muted_color | default "#5d6b64" }};
+      --color-accent: {{ $theme.accent_color | default "#0d6e5c" }};
+      --color-accent-text: {{ $theme.accent_text_color | default "#ffffff" }};
+      --color-border: {{ $theme.border_color | default "#d8d0c4" }};
+      --color-header: {{ $theme.header_bg | default $theme.surface_color | default "#fffcf6" }};
+      --color-footer: {{ $theme.footer_bg | default "#e7e0d4" }};
+    }
+  </style>
+  <link rel="stylesheet" href="{{ "css/site.css" | relURL }}">
+</head>
+<body>
+  {{ partial "header.html" . }}
+  <main>
+    {{ block "main" . }}{{ end }}
+  </main>
+  {{ partial "footer.html" . }}
+  {{ partial "consent.html" . }}
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script src="/js/swiper-init.js"></script>
+  <script src="/js/gallery-init.js"></script>
+  <script src="/js/consent.js"></script>
+</body>
+</html>

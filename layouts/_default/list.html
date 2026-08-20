@@ -1,0 +1,12 @@
+{{ define "main" }}
+<h2>{{ .Title }}</h2>
+{{ with .Content }}<div class="content">{{ . }}</div>{{ end }}
+{{ $pages := .Pages }}
+{{ if $pages }}
+  <ul class="simple-list">
+    {{ range $pages }}
+      <li><a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ with .Params.description }} – {{ . }}{{ end }}</li>
+    {{ end }}
+  </ul>
+{{ end }}
+{{ end }}

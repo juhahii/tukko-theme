@@ -1,0 +1,151 @@
+{{ $site := .Site.Data.site | default dict }}
+{{ $contact := $site.contact | default dict }}
+{{ $social := $site.social | default dict }}
+{{ $base := strings.TrimSuffix "/" .Site.BaseURL }}
+{{ $orgId := printf "%s/#organization" $base }}
+{{ $siteId := printf "%s/#website" $base }}
+
+{{ $abs := "" }}
+{{ $logo := $site.logo_large | default $site.logo_small | default "" }}
+{{ if $logo }}
+  {{ if or (hasPrefix $logo "http://") (hasPrefix $logo "https://") }}
+    {{ $abs = $logo }}
+  {{ else }}
+    {{ $abs = $logo | absURL }}
+  {{ end }}
+{{ end }}
+
+{{ $orgType := "Organization" }}
+{{ if or $contact.address $contact.phone $contact.email }}{{ $orgType = "LocalBusiness" }}{{ end }}
+{{ $org := dict
+  "@type" $orgType
+  "@id" $orgId
+  "name" .Site.Title
+  "url" (printf "%s/" $base)
+}}
+{{ if $abs }}
+  {{ $org = merge $org (dict "logo" (dict "@type" "ImageObject" "url" $abs) "image" $abs) }}
+{{ end }}
+{{ with $contact.email }}{{ $org = merge $org (dict "email" .) }}{{ end }}
+{{ with $contact.phone }}{{ $org = merge $org (dict "telephone" .) }}{{ end }}
+{{ with $contact.address }}
+  {{ $org = merge $org (dict "address" (dict "@type" "PostalAddress" "streetAddress" . "addressCountry" "FI")) }}
+{{ end }}
+{{ $same := slice }}
+{{ with $social.facebook }}{{ $same = $same | append . }}{{ end }}
+{{ with $social.x }}{{ $same = $same | append . }}{{ end }}
+{{ with $social.instagram }}{{ $same = $same | append . }}{{ end }}
+{{ with $social.youtube }}{{ $same = $same | append . }}{{ end }}
+{{ if $same }}{{ $org = merge $org (dict "sameAs" $same) }}{{ end }}
+
+{{ $website := dict
+  "@type" "WebSite"
+  "@id" $siteId
+  "url" (printf "%s/" $base)
+  "name" .Site.Title
+  "inLanguage" "fi"
+  "publisher" (dict "@id" $orgId)
+}}
+{{ with $site.description }}{{ $website = merge $website (dict "description" .) }}{{ end }}
+
+{{ $desc := "" }}
+{{ with .Params.description }}{{ $desc = . }}{{ end }}
+{{ if not $desc }}{{ with $site.description }}{{ $desc = . }}{{ end }}{{ end }}
+
+{{ $images := slice }}
+{{ with .Params.teaserImage }}{{ $images = $images | append (cond (or (hasPrefix . "http://") (hasPrefix . "https://")) . (. | absURL)) }}{{ end }}
+{{ range .Params.mainImages }}
+  {{ with .image }}
+    {{ $images = $images | append (cond (or (hasPrefix . "http://") (hasPrefix . "https://")) . (. | absURL)) }}
+  {{ end }}
+{{ end }}
+{{ if and (not $images) $abs }}{{ $images = $images | append $abs }}{{ end }}
+{{ $uniq := slice }}
+{{ range $images }}
+  {{ if not (in $uniq .) }}{{ $uniq = $uniq | append . }}{{ end }}
+{{ end }}
+{{ $images = $uniq }}
+
+{{ $pageId := printf "%s#webpage" .Permalink }}
+{{ $pageType := "WebPage" }}
+{{ if .IsHome }}
+  {{ $pageType = "WebPage" }}
+{{ else if eq .Kind "section" }}
+  {{ $pageType = "CollectionPage" }}
+{{ end }}
+{{ $webpage := dict
+  "@type" $pageType
+  "@id" $pageId
+  "url" .Permalink
+  "name" (cond .IsHome .Site.Title .Title)
+  "isPartOf" (dict "@id" $siteId)
+  "inLanguage" "fi"
+}}
+{{ with $desc }}{{ $webpage = merge $webpage (dict "description" .) }}{{ end }}
+{{ if $images }}{{ $webpage = merge $webpage (dict "image" $images) }}{{ end }}
+{{ if not .Date.IsZero }}{{ $webpage = merge $webpage (dict "datePublished" (.Date.Format "2006-01-02")) }}{{ end }}
+{{ if not .Lastmod.IsZero }}{{ $webpage = merge $webpage (dict "dateModified" (.Lastmod.Format "2006-01-02")) }}{{ end }}
+
+{{ $sectionName := "" }}
+{{ $sectionURL := "" }}
+{{ $ct := .Params.content_type | default "" }}
+{{ if or (eq $ct "Tuote") (eq .Section "tuotteet") }}
+  {{ $sectionName = "Tuotteet" }}{{ $sectionURL = "/tuotteet/" | absURL }}
+{{ else if or (eq $ct "Referenssi") (eq .Section "referenssit") }}
+  {{ $sectionName = "Referenssit" }}{{ $sectionURL = "/referenssit/" | absURL }}
+{{ else if or (eq $ct "Kampanja") (eq .Section "kampanjat") }}
+  {{ $sectionName = "Kampanjat" }}{{ $sectionURL = "/kampanjat/" | absURL }}
+{{ else if or (eq $ct "Sivu") (eq .Section "sivut") }}
+  {{ $sectionName = "Sivut" }}{{ $sectionURL = "/sivut/" | absURL }}
+{{ end }}
+
+{{ $is404 := in .RelPermalink "404" }}
+{{ if and (not .IsHome) (not $is404) }}
+  {{ $items := slice (dict "@type" "ListItem" "position" 1 "name" .Site.Title "item" (printf "%s/" $base)) }}
+  {{ $pos := 2 }}
+  {{ $isSectionHome := and (eq .Kind "section") $sectionName }}
+  {{ if and $sectionName (not $isSectionHome) }}
+    {{ $items = $items | append (dict "@type" "ListItem" "position" $pos "name" $sectionName "item" $sectionURL) }}
+    {{ $pos = add $pos 1 }}
+  {{ end }}
+  {{ $items = $items | append (dict "@type" "ListItem" "position" $pos "name" .Title "item" .Permalink) }}
+  {{ $webpage = merge $webpage (dict "breadcrumb" (dict "@type" "BreadcrumbList" "itemListElement" $items)) }}
+{{ end }}
+
+{{ $graph := slice $org $website $webpage }}
+
+{{ if and (eq $ct "Tuote") (not .IsHome) }}
+  {{ $product := dict
+    "@type" "Product"
+    "@id" (printf "%s#product" .Permalink)
+    "name" .Title
+    "url" .Permalink
+    "mainEntityOfPage" (dict "@id" $pageId)
+  }}
+  {{ with $desc }}{{ $product = merge $product (dict "description" .) }}{{ end }}
+  {{ if $images }}{{ $product = merge $product (dict "image" $images) }}{{ end }}
+  {{ with .Params.manufacturer }}
+    {{ $manuf := partial "rel-by-slug.html" (dict "pages" (where site.RegularPages "Section" "manufacturers") "key" .) }}
+    {{ $brandName := . }}
+    {{ if $manuf }}{{ $brandName = $manuf.Title }}{{ end }}
+    {{ $product = merge $product (dict "brand" (dict "@type" "Brand" "name" $brandName)) }}
+  {{ end }}
+  {{ with .Params.price }}
+    {{ $priceNum := replaceRE "[^0-9.,]" "" . }}
+    {{ $priceNum = replace $priceNum "," "." }}
+    {{ if $priceNum }}
+      {{ $product = merge $product (dict "offers" (dict
+        "@type" "Offer"
+        "url" $.Permalink
+        "priceCurrency" "EUR"
+        "price" $priceNum
+      )) }}
+    {{ end }}
+  {{ end }}
+  {{ $graph = $graph | append $product }}
+{{ end }}
+
+{{ $ld := dict "@context" "https://schema.org" "@graph" $graph }}
+<script type="application/ld+json">
+{{ $ld | jsonify | safeJS }}
+</script>

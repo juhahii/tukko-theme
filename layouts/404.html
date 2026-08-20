@@ -1,0 +1,16 @@
+{{ define "title" }}Sivua ei löytynyt | {{ .Site.Title }}{{ end }}
+{{ define "main" }}
+<div class="error-page">
+  <h1>404</h1>
+  <p>Oho! Etsimääsi sivua ei löytynyt.</p>
+  <p><a class="cta-button" href="{{ "/" | relURL }}">Palaa etusivulle</a></p>
+  {{ with .Site.Data.site.contact }}
+  <div class="error-contact">
+    <strong>Yhteystiedot</strong><br>
+    {{ with .email }}<a href="mailto:{{ . }}">{{ . }}</a><br>{{ end }}
+    {{ with .phone }}{{ . }}<br>{{ end }}
+    {{ with .address }}{{ . }}{{ end }}
+  </div>
+  {{ end }}
+</div>
+{{ end }}

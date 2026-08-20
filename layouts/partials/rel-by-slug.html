@@ -1,0 +1,16 @@
+{{/* Find a page whose file slug (or .Slug) matches .key. Title is a fallback for old CMS values. */}}
+{{ $pages := .pages | default slice }}
+{{ $key := printf "%s" (.key | default "") }}
+{{ $match := false }}
+{{ if $key }}
+  {{ range $pages }}
+    {{ if not $match }}
+      {{ $fileSlug := "" }}
+      {{ with .File }}{{ $fileSlug = .BaseFileName }}{{ end }}
+      {{ if or (eq $fileSlug $key) (eq .Slug $key) (eq .Title $key) }}
+        {{ $match = . }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+{{ return $match }}
