@@ -6,7 +6,14 @@ This repository is the **engine**. A site that uses it keeps its own `content/`,
 
 ## Use in a site
 
-Place this folder at `themes/tukko` (clone, submodule, or copy). Copy `hugo.toml.example` to the site root as `hugo.toml` and set `baseURL` and `title`.
+Place this folder at `themes/tukko`. Copy `hugo.toml.example` to the site root as `hugo.toml` and set `baseURL` and `title`.
+
+As a git submodule:
+
+```bash
+git submodule add git@github.com:juhahii/tukko-theme.git themes/tukko
+git submodule update --init --recursive
+```
 
 The example includes `[imaging]` and the `assets/media` → `static/media` mount. Without those, uploads are not processed and Decap preview of `/media/` breaks.
 
