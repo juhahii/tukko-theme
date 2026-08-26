@@ -823,7 +823,12 @@ form.contact-form label {
   font-size: 0.9rem;
   font-weight: 500;
 }
+form.contact-form .field-optional {
+  font-weight: 400;
+  color: var(--color-muted);
+}
 form.contact-form input[type="email"],
+form.contact-form input[type="tel"],
 form.contact-form textarea {
   width: 100%;
   padding: 0.5rem 0.6rem;
