@@ -17,7 +17,7 @@
       {{- if eq $ext ".svg" -}}
         {{- $u := $res.RelPermalink -}}
         {{- if $absolute -}}{{ $u = $res.Permalink }}{{- end -}}
-        {{- $out = dict "url" $u "jpeg" $u "webp" "" "width" $res.Width "height" $res.Height -}}
+        {{- $out = dict "url" $u "jpeg" $u "webp" "" "width" 0 "height" 0 -}}
       {{- else -}}
         {{- $jpeg := false -}}
         {{- $webp := false -}}
