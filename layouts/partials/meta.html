@@ -34,6 +34,8 @@
 <meta property="og:title" content="{{ $fullTitle }}">
 {{ with $desc }}<meta property="og:description" content="{{ . }}">{{ end }}
 {{ with $imgAbs }}<meta property="og:image" content="{{ . }}">{{ end }}
+{{ with $siteMeta.fb_app_id }}<meta property="fb:app_id" content="{{ . }}">{{ end }}
+{{ with $siteMeta.fb_page_id }}<meta property="fb:pages" content="{{ . }}">{{ end }}
 
 <meta name="twitter:card" content="{{ if $imgAbs }}summary_large_image{{ else }}summary{{ end }}">
 {{ with $siteMeta.twitter }}<meta name="twitter:site" content="{{ . }}">{{ end }}

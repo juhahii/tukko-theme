@@ -862,6 +862,16 @@ collections:
                 name: "twitter"
                 widget: "string"
                 required: false
+              - label: "Facebook App ID (fb:app_id)"
+                name: "fb_app_id"
+                widget: "string"
+                required: false
+                hint: "Kehittäjäsovelluksen tunnus (developers.facebook.com), ei Facebook-sivun tunnus. Tarvitaan jakamisen tilastoihin ja OG-sovellukseen."
+              - label: "Facebook-sivun tunnus (fb:pages)"
+                name: "fb_page_id"
+                widget: "string"
+                required: false
+                hint: "Sivun numeerinen ID. Tämä yhdistää verkkosivuston Facebook-sivuun. Löytyy sivun Tietoja-kohdasta tai sivun URL-osoitteesta."
           - label: "Analytiikka"
             name: "analytics"
             widget: "object"
