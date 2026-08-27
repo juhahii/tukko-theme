@@ -12,10 +12,10 @@
 
 {{ if $useProduct }}
 <article class="product-page">
-  <header class="product-header">
-    <h1>{{ .Title }}</h1>
-  </header>
   <div class="product-hero">
+    <header class="product-header">
+      <h1>{{ .Title }}</h1>
+    </header>
     {{ partial "content-gallery.html" . }}
     <div class="product-summary">
       {{ with .Params.manufacturer }}

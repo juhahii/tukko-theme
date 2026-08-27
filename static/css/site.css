@@ -659,6 +659,9 @@ main > .frontpage-section:first-child { border-top: none; padding-top: 0; margin
     gap: 2rem;
     align-items: start;
   }
+  .product-header {
+    grid-column: 1 / -1;
+  }
   .product-hero .media-gallery {
     position: sticky;
     top: 1rem;
@@ -788,7 +791,7 @@ main > .frontpage-section:first-child { border-top: none; padding-top: 0; margin
 }
 .product-header {
   width: 100%;
-  margin: 0 0 1.25rem;
+  margin: 0;
 }
 .product-header h1 {
   margin: 0;
