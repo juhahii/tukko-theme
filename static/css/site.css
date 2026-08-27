@@ -777,8 +777,10 @@ main > .frontpage-section:first-child { border-top: none; padding-top: 0; margin
   margin: 0 0 0.6rem;
 }
 .product-brand img {
+  height: 36px;
   max-height: 36px;
   width: auto;
+  max-width: 100%;
   display: block;
 }
 .product-brand-name {
@@ -1029,10 +1031,10 @@ form.contact-form .hidden {
   opacity: 0.85;
 }
 .manufacturer-logo {
-  max-width: 100%;
+  height: 48px;
   max-height: 48px;
+  max-width: 100%;
   width: auto;
-  height: auto;
   object-fit: contain;
 }
 .manufacturer-name {
