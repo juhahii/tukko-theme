@@ -1,17 +1,14 @@
 <header class="site-header">
   <div class="header-inner">
-    <a href="/" class="logo">
-      {{ if .IsHome }}
-        {{ with .Site.Data.site.logo_large }}
-          {{ partial "img.html" (dict "src" . "alt" $.Site.Title "class" "logo-large" "variant" "logo" "eager" true) }}
-        {{ else }}
-          <span class="logo-text">{{ $.Site.Title }}</span>
-        {{ end }}
+    <a href="/" class="header-brand">
+      {{ with .Site.Data.site.logo_small }}
+        {{ partial "img.html" (dict "src" . "alt" $.Site.Title "class" "logo-small" "variant" "logo" "eager" true) }}
       {{ else }}
-        {{ with .Site.Data.site.logo_small }}
-          {{ partial "img.html" (dict "src" . "alt" $.Site.Title "class" "logo-small" "variant" "logo" "eager" true) }}
-        {{ else }}
-          <span class="logo-text">{{ $.Site.Title }}</span>
+        <span class="logo-text">{{ $.Site.Title }}</span>
+      {{ end }}
+      {{ if .Site.Data.site.show_header_text }}
+        {{ with .Site.Data.site.header_text }}
+          <span class="header-tagline">{{ . }}</span>
         {{ end }}
       {{ end }}
     </a>

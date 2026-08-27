@@ -825,14 +825,26 @@ collections:
             name: "favicon"
             widget: "image"
             required: false
-          - label: "Pieni logo (valikko / pieni)"
+          - label: "Pieni logo (ylätunniste)"
             name: "logo_small"
             widget: "image"
             required: false
-          - label: "Suuri logo (etusivu / päälogo)"
+            hint: "Näkyy vain sivun yläpalkissa."
+          - label: "Suuri logo (alatunniste)"
             name: "logo_large"
             widget: "image"
             required: false
+            hint: "Näkyy vain sivun alatunnisteessa."
+          - label: "Ylätunnisteen teksti"
+            name: "header_text"
+            widget: "string"
+            required: false
+            hint: "Lyhyt teksti logon vieressä. Rivittyy enintään kahdelle riville, sanoja ei katkaista."
+          - label: "Näytä teksti ylätunnisteessa"
+            name: "show_header_text"
+            widget: "boolean"
+            default: false
+            hint: "Jos pois päältä, ylätunnisteen tekstiä ei näytetä."
           - label: "Sivuston kuvaus"
             name: "description"
             widget: "text"
