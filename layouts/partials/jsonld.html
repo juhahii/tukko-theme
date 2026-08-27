@@ -12,11 +12,11 @@
 {{ end }}
 
 {{ $orgType := "Organization" }}
-{{ if or $contact.address $contact.phone $contact.email }}{{ $orgType = "LocalBusiness" }}{{ end }}
+{{ if or $contact.address $contact.phone $contact.email $contact.company_name }}{{ $orgType = "LocalBusiness" }}{{ end }}
 {{ $org := dict
   "@type" $orgType
   "@id" $orgId
-  "name" .Site.Title
+  "name" ($contact.company_name | default .Site.Title)
   "url" (printf "%s/" $base)
 }}
 {{ if $abs }}

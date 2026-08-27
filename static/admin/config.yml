@@ -935,6 +935,11 @@ collections:
             widget: "object"
             collapsed: true
             fields:
+              - label: "Yrityksen nimi"
+                name: "company_name"
+                widget: "string"
+                required: false
+                hint: "Näkyy alatunnisteen yhteystiedoissa ylimpänä."
               - label: "Sähköposti"
                 name: "email"
                 widget: "string"

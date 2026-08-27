@@ -6,7 +6,7 @@
   <p><a class="cta-button" href="{{ "/" | relURL }}">Palaa etusivulle</a></p>
   {{ with .Site.Data.site.contact }}
   <div class="error-contact">
-    <strong>Yhteystiedot</strong><br>
+    <strong>{{ with .company_name }}{{ . }}{{ else }}Yhteystiedot{{ end }}</strong><br>
     {{ with .email }}<a href="mailto:{{ . }}">{{ . }}</a><br>{{ end }}
     {{ with .phone }}{{ . }}<br>{{ end }}
     {{ with .address }}{{ . }}{{ end }}

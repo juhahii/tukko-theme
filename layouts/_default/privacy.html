@@ -14,7 +14,7 @@
   <div class="simple-body content privacy-body">
     <h2>Rekisterinpitäjä</h2>
     <p>
-      {{ $.Site.Title }}<br>
+      {{ with $contact.company_name }}{{ . }}{{ else }}{{ $.Site.Title }}{{ end }}<br>
       {{ with $contact.address }}{{ . }}<br>{{ end }}
       {{ with $contact.email }}<a href="mailto:{{ . }}">{{ . }}</a><br>{{ end }}
       {{ with $contact.phone }}{{ . }}{{ end }}
