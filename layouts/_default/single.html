@@ -12,6 +12,9 @@
 
 {{ if $useProduct }}
 <article class="product-page">
+  <header class="product-header">
+    <h1>{{ .Title }}</h1>
+  </header>
   <div class="product-hero">
     {{ partial "content-gallery.html" . }}
     <div class="product-summary">
@@ -26,7 +29,6 @@
         {{ end }}
       {{ end }}
 
-      <h1>{{ .Title }}</h1>
       {{ with .Params.description }}<p class="product-lead">{{ . }}</p>{{ end }}
 
       {{ with .Params.price }}

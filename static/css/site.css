@@ -786,10 +786,17 @@ main > .frontpage-section:first-child { border-top: none; padding-top: 0; margin
   text-transform: uppercase;
   color: var(--color-muted);
 }
-.product-summary h1 {
-  margin: 0 0 0.5rem;
-  font-size: 1.65rem;
-  line-height: 1.25;
+.product-header {
+  width: 100%;
+  margin: 0 0 1.25rem;
+}
+.product-header h1 {
+  margin: 0;
+  font-size: 2.15rem;
+  line-height: 1.2;
+}
+@media (max-width: 767px) {
+  .product-header h1 { font-size: 1.85rem; }
 }
 .product-lead {
   margin: 0 0 1rem;
