@@ -1,0 +1,8 @@
+{{ $ct := .Params.content_type | default "" }}
+{{ $kind := "page" }}
+{{ if eq $ct "Tuote" }}{{ $kind = "product" }}
+{{ else if eq $ct "Referenssi" }}{{ $kind = "reference" }}
+{{ else if eq $ct "Kampanja" }}{{ $kind = "kampanja" }}
+{{ else if eq $ct "Palvelu" }}{{ $kind = "service" }}
+{{ end }}
+{{ return $kind }}

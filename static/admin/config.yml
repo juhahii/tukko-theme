@@ -152,6 +152,44 @@ collections:
         name: "body"
         widget: "markdown"
         required: false
+      - label: "Laajennukset"
+        name: "extensions"
+        widget: "list"
+        required: false
+        hint: "Yksi tai useampi lohko, joka listaa muuta sisältöä tämän sivun lopussa."
+        summary: "{{fields.title}}"
+        fields:
+          - label: "Otsikko"
+            name: "title"
+            widget: "string"
+            required: false
+          - label: "Näytä otsikko"
+            name: "showHeading"
+            widget: "boolean"
+            default: true
+          - label: "Näyttötila"
+            name: "display"
+            widget: "select"
+            default: "cards"
+            options:
+              - { label: "Oletus (lista)", value: "default" }
+              - { label: "Lista (kuten osiosivu)", value: "list" }
+              - { label: "Kortit (grid)", value: "cards" }
+              - { label: "Carousel - Cards", value: "carousel-cards" }
+              - { label: "Carousel - Full width poster", value: "carousel-poster" }
+              - { label: "Kuvaruudukko (galleria)", value: "image-grid" }
+              - { label: "Nosto, kuva oikealla", value: "featured-split" }
+              - { label: "Nosto, kuva vasemmalla", value: "featured-split-left" }
+          - label: "Sisältö"
+            name: "items"
+            widget: "relation"
+            collection: "content"
+            searchFields: ["title"]
+            valueField: "{{slug}}"
+            displayFields: ["title", "content_type"]
+            multiple: true
+            required: false
+            hint: "Valitse yksi tai useampi sisältö. Tallennetaan slugina."
 
       # Core field for linking to manufacturer
       - label: "Valmistaja"

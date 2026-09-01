@@ -59,16 +59,18 @@
 {{ else }}
   <ul class="simple-list">
     {{ range $items }}
+      {{ $kind := $type }}
+      {{ if not $kind }}{{ $kind = partial "item-kind.html" . }}{{ end }}
       <li>
         <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-        {{ if eq $type "product" }}{{ with .Params.price }} — {{ . }}{{ end }}{{ end }}
-        {{ if eq $type "reference" }}
+        {{ if eq $kind "product" }}{{ with .Params.price }} — {{ . }}{{ end }}{{ end }}
+        {{ if eq $kind "reference" }}
           {{ with .Params.usedProduct }}
             {{ $product := partial "rel-by-slug.html" (dict "pages" (where site.RegularPages "Params.content_type" "Tuote") "key" .) }}
             ({{ if $product }}{{ $product.Title }}{{ else }}{{ . }}{{ end }})
           {{ end }}
         {{ end }}
-        {{ if or (eq $type "page") (eq $type "kampanja") (eq $type "service") }} — {{ .Params.description }}{{ end }}
+        {{ if or (eq $kind "page") (eq $kind "kampanja") (eq $kind "service") }} — {{ .Params.description }}{{ end }}
       </li>
     {{ end }}
   </ul>

@@ -84,6 +84,8 @@
   {{ end }}
 {{ end }}
 
+  {{ partial "content-extensions.html" . }}
+
   {{ $fp := site.Data.frontpage | default dict }}
   {{ if or .Params.showPeople .Params.people }}
   <div class="people-widget-wrapper">

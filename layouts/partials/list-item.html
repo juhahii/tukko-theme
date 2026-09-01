@@ -1,5 +1,6 @@
 {{ $item := .item }}
 {{ $type := .type | default "" }}
+{{ if not $type }}{{ $type = partial "item-kind.html" $item }}{{ end }}
 <div class="list-item">
   {{ with $item.Params.teaserImage }}
     <a class="list-item-media" href="{{ $item.RelPermalink }}">

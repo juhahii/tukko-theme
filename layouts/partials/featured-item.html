@@ -1,5 +1,7 @@
 {{ $item := .item }}
 {{ $mode := .mode | default "" }}
+{{ $type := .type | default "" }}
+{{ if not $type }}{{ $type = partial "item-kind.html" $item }}{{ end }}
 
 {{ if eq $mode "card" }}
 <a href="{{ $item.RelPermalink }}" class="card">
@@ -11,11 +13,11 @@
     {{ with $item.Params.description }}
       <p class="card-desc">{{ . }}</p>
     {{ end }}
-    {{ if eq .type "product" }}
+    {{ if eq $type "product" }}
       {{ with $item.Params.price }}
         <strong class="card-price">{{ . }}</strong>
       {{ end }}
-    {{ else if eq .type "reference" }}
+    {{ else if eq $type "reference" }}
       {{ with $item.Params.usedProduct }}
         {{ $product := partial "rel-by-slug.html" (dict "pages" (where site.RegularPages "Params.content_type" "Tuote") "key" .) }}
         <small>Käytetty: {{ if $product }}{{ $product.Title }}{{ else }}{{ . }}{{ end }}</small>
@@ -32,11 +34,11 @@
   {{ with $item.Params.description }}
     <p class="card-desc">{{ . }}</p>
   {{ end }}
-  {{ if eq .type "product" }}
+  {{ if eq $type "product" }}
     {{ with $item.Params.price }}
       <strong class="card-price">{{ . }}</strong>
     {{ end }}
-  {{ else if eq .type "reference" }}
+  {{ else if eq $type "reference" }}
     {{ with $item.Params.usedProduct }}
       {{ $product := partial "rel-by-slug.html" (dict "pages" (where site.RegularPages "Params.content_type" "Tuote") "key" .) }}
       <small>Käytetty: {{ if $product }}{{ $product.Title }}{{ else }}{{ . }}{{ end }}</small>
