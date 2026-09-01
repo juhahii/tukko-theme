@@ -94,6 +94,8 @@
   {{ $secPage = site.GetPage "/kampanjat" }}
 {{ else if or (eq $ct "Sivu") (eq .Section "sivut") }}
   {{ $secPage = site.GetPage "/sivut" }}
+{{ else if or (eq $ct "Palvelu") (eq .Section "palvelut") }}
+  {{ $secPage = site.GetPage "/palvelut" }}
 {{ end }}
 {{ with $secPage }}
   {{ $sectionName = .Title }}

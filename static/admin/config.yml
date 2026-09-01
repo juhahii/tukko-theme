@@ -30,6 +30,9 @@ collections:
       - label: Sivut
         field: content_type
         pattern: Sivu
+      - label: Palvelut
+        field: content_type
+        pattern: Palvelu
     view_groups:
       - label: Sisältötyyppi
         field: content_type
@@ -42,6 +45,7 @@ collections:
           - { label: "Referenssi", value: "Referenssi" }
           - { label: "Sivu", value: "Sivu" }
           - { label: "Kampanja", value: "Kampanja" }
+          - { label: "Palvelu", value: "Palvelu" }
         default: "Sivu"
       - label: "Sivupohja"
         name: "page_template"
@@ -61,7 +65,7 @@ collections:
         name: "url"
         widget: "string"
         required: false
-        hint: "Täyttyy automaattisesti tallennettaessa: /tuotteet/slug/, /referenssit/slug/, /kampanjat/slug/ tai /sivut/slug/. Voit yliajaa käsin."
+        hint: "Täyttyy automaattisesti tallennettaessa: /tuotteet/slug/, /referenssit/slug/, /kampanjat/slug/, /palvelut/slug/ tai /sivut/slug/. Voit yliajaa käsin."
       - label: "Kuvaus"
         name: "description"
         widget: "text"
@@ -497,6 +501,77 @@ collections:
                 widget: "number"
                 value_type: "int"
                 default: 3
+              - label: "Näytä navigointinuolit"
+                name: "showNavigation"
+                widget: "boolean"
+                default: true
+
+          - label: "Palvelut-osio"
+            name: "palvelut"
+            widget: "object"
+            collapsed: true
+            fields:
+              - label: "Näytä etusivulla"
+                name: "enabled"
+                widget: "boolean"
+                default: true
+              - label: "Järjestys"
+                name: "order"
+                widget: "number"
+                value_type: "int"
+                default: 18
+              - label: "Näytä osion otsikko"
+                name: "showHeading"
+                widget: "boolean"
+                default: true
+                hint: "Jos pois päältä, osion otsikkoa ei näytetä etusivulla."
+              - label: "Otsikko"
+                name: "title"
+                widget: "string"
+                default: "Palvelut"
+                required: false
+              - label: "Osion sisältö"
+                name: "content"
+                widget: "markdown"
+                required: false
+                hint: "Näytetään etusivulla osion otsikon alla. Riittää myös yksinään landing page -lohoksi."
+              - label: "Toimintakehotteet (CTA)"
+                name: "ctas"
+                widget: "list"
+                required: false
+                hint: "Voit lisätä useita. Linkillä näytetään painike, ilman linkkiä pelkkä teksti."
+                summary: "{{fields.label}}"
+                fields:
+                  - label: "Teksti"
+                    name: "label"
+                    widget: "string"
+                  - label: "Linkki"
+                    name: "url"
+                    widget: "string"
+                    required: false
+                    hint: "Tyhjä = pelkkä teksti. Polku (/palvelut/), ankkuri (#osio-yhteystiedot), tel:/mailto: tai ulkoinen osoite."
+              - label: "Näytä kategorian sivut"
+                name: "showSubPages"
+                widget: "boolean"
+                default: true
+                hint: "Jos pois päältä, kategorian kohteita ja listasivua ei näytetä. Osio toimii vain etusivun sisältölohona."
+              - label: "Näyttötila"
+                name: "display"
+                widget: "select"
+                options:
+                  - { label: "Oletus (lista)", value: "default" }
+                  - { label: "Lista (kuten osiosivu)", value: "list" }
+                  - { label: "Kortit", value: "cards" }
+                  - { label: "Carousel", value: "carousel" }
+                  - { label: "Kuvaruudukko (galleria)", value: "image-grid" }
+                  - { label: "Nosto, kuva oikealla", value: "featured-split" }
+                  - { label: "Nosto, kuva vasemmalla", value: "featured-split-left" }
+                default: "default"
+              - label: "Max määrä näytettäväksi"
+                name: "limit"
+                widget: "number"
+                value_type: "int"
+                default: 6
               - label: "Näytä navigointinuolit"
                 name: "showNavigation"
                 widget: "boolean"
@@ -977,6 +1052,10 @@ collections:
                 default: true
               - label: "Näytä Sivut"
                 name: "pages"
+                widget: "boolean"
+                default: true
+              - label: "Näytä Palvelut"
+                name: "palvelut"
                 widget: "boolean"
                 default: true
               - label: "Näytä Kampanjat"

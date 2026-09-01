@@ -1,0 +1,20 @@
+{{ define "main" }}
+{{ if not (partial "show-subpages.html" "palvelut") }}
+  {{ partial "hidden-section.html" . }}
+{{ else }}
+  {{ $cfg := site.Data.frontpage.palvelut | default dict }}
+  <h2>{{ $cfg.title | default .Title }}</h2>
+  {{ with $cfg.content }}<div class="section-content">{{ . | markdownify }}</div>{{ end }}
+  {{ partial "section-ctas.html" $cfg.ctas }}
+  {{ $items := where .Site.RegularPages "Params.content_type" "Palvelu" }}
+  {{ if $items }}
+    <ul>
+    {{ range $items }}
+      <li><a href="{{ .RelPermalink }}">{{ .Title }}</a> {{ with .Params.description }}– {{ . }}{{ end }}</li>
+    {{ end }}
+    </ul>
+  {{ else }}
+    <p>Ei palveluita.</p>
+  {{ end }}
+{{ end }}
+{{ end }}

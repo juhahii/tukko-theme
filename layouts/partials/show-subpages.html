@@ -1,7 +1,7 @@
 {{/*
   Returns whether a frontpage category should expose its list + item pages.
   Usage: {{ if partial "show-subpages.html" "products" }}
-  Keys: products | references | pages | kampanjat
+  Keys: products | references | pages | kampanjat | palvelut
 */}}
 {{ $cfg := index (site.Data.frontpage | default dict) . | default dict }}
 {{ return ($cfg.showSubPages | default true) }}

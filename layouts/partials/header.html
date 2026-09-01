@@ -23,9 +23,12 @@
       {{ range sort (where .Site.RegularPages "Params.showInMenu" true) "Title" }}
         <a href="{{ .RelPermalink }}">{{ .Title }}</a>
       {{ end }}
-      {{ $menu := .Site.Data.site.menu | default (dict "products" true "references" true "pages" true "kampanjat" true) }}
+      {{ $menu := .Site.Data.site.menu | default (dict "products" true "references" true "pages" true "kampanjat" true "palvelut" true) }}
       {{ if and $menu.products (partial "show-subpages.html" "products") }}
         {{ with site.GetPage "/tuotteet" }}<a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ end }}
+      {{ end }}
+      {{ if and $menu.palvelut (partial "show-subpages.html" "palvelut") }}
+        {{ with site.GetPage "/palvelut" }}<a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ end }}
       {{ end }}
       {{ if and $menu.references (partial "show-subpages.html" "references") }}
         {{ with site.GetPage "/referenssit" }}<a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ end }}

@@ -8,6 +8,7 @@
 {{ $sectionDefs = $sectionDefs | append (dict "config" ($fp.products | default dict) "contentType" "Tuote" "ptype" "product" "slug" "tuotteet") }}
 {{ $sectionDefs = $sectionDefs | append (dict "config" ($fp.references | default dict) "contentType" "Referenssi" "ptype" "reference" "slug" "referenssit") }}
 {{ $sectionDefs = $sectionDefs | append (dict "config" ($fp.pages | default dict) "contentType" "Sivu" "ptype" "page" "slug" "sivut") }}
+{{ $sectionDefs = $sectionDefs | append (dict "config" ($fp.palvelut | default dict) "contentType" "Palvelu" "ptype" "service" "slug" "palvelut") }}
 {{ $sectionDefs = $sectionDefs | append (dict "config" ($fp.kampanjat | default dict) "contentType" "Kampanja" "ptype" "kampanja" "slug" "kampanjat") }}
 {{ $sectionDefs = $sectionDefs | append (dict "config" ($fp.people | default dict) "widget" "people" "ptype" "people" "slug" "henkilot") }}
 {{ $sectionDefs = $sectionDefs | append (dict "config" ($fp.manufacturers | default dict) "widget" "manufacturers" "ptype" "manufacturers" "slug" "valmistajat") }}

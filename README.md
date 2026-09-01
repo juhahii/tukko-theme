@@ -19,7 +19,7 @@ The example includes `[imaging]` and the `assets/media` → `static/media` mount
 
 The site still needs:
 
-- `content/content/` plus virtual lists (`content/tuotteet/_index.md`, `referenssit`, `kampanjat`, `sivut`)
+- `content/content/` plus virtual lists (`content/tuotteet/_index.md`, `referenssit`, `kampanjat`, `sivut`, `palvelut`)
 - `content/people/` and `content/manufacturers/` with `_build.render: never` (widgets only)
 - `data/site.yaml`, `data/frontpage.yaml`, `data/consent.yaml`
 - `assets/media/` for uploads (`media_folder` in Decap). Originals are mounted at `/media/` for CMS preview; templates process them to WebP/JPEG.
@@ -33,13 +33,13 @@ Tukko is **Finnish-only**. Buttons, 404, consent UI, form labels, and the Decap 
 
 Site-specific labels come from content and CMS data:
 
-- Nav and breadcrumbs: titles of `content/tuotteet/_index.md` (and referenssit, kampanjat, sivut)
+- Nav and breadcrumbs: titles of `content/tuotteet/_index.md` (and referenssit, kampanjat, sivut, palvelut)
 - People / contact headings on content pages: Etusivun asetukset → Henkilöt / Yhteystietolomake titles
 - Privacy link: the content item with `layout: privacy` (its title and `url`)
 
 ## RSS
 
-`/index.xml` is the site-wide feed of latest public Sisältö (Tuote, Referenssi, Sivu, Kampanja). Section feeds (`/tuotteet/index.xml` etc.) list that type. People, manufacturers, and the privacy page are omitted.
+`/index.xml` is the site-wide feed of latest public Sisältö (Tuote, Referenssi, Sivu, Kampanja, Palvelu). Section feeds (`/tuotteet/index.xml` etc.) list that type. People, manufacturers, and the privacy page are omitted.
 
 ## Requires
 

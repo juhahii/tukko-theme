@@ -14,6 +14,7 @@
   {{ else if eq $type "reference" }}{{ $listPage = site.GetPage "/referenssit" }}
   {{ else if eq $type "kampanja" }}{{ $listPage = site.GetPage "/kampanjat" }}
   {{ else if eq $type "page" }}{{ $listPage = site.GetPage "/sivut" }}
+  {{ else if eq $type "service" }}{{ $listPage = site.GetPage "/palvelut" }}
   {{ end }}
   {{ with $listPage }}{{ $listUrl = .RelPermalink }}{{ end }}
 {{ end }}
@@ -113,7 +114,7 @@
                 ({{ if $product }}{{ $product.Title }}{{ else }}{{ . }}{{ end }})
               {{ end }}
             {{ end }}
-            {{ if or (eq $type "page") (eq $type "kampanja") }} — {{ .Params.description }}{{ end }}
+            {{ if or (eq $type "page") (eq $type "kampanja") (eq $type "service") }} — {{ .Params.description }}{{ end }}
           </li>
         {{ end }}
       </ul>

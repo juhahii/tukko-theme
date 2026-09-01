@@ -1,4 +1,4 @@
-{{- $types := slice "Tuote" "Referenssi" "Sivu" "Kampanja" -}}
+{{- $types := slice "Tuote" "Referenssi" "Sivu" "Kampanja" "Palvelu" -}}
 {{- $pages := slice -}}
 {{- if .IsHome -}}
   {{- $pages = where site.RegularPages "Params.content_type" "in" $types -}}
@@ -10,6 +10,8 @@
   {{- $pages = where site.RegularPages "Params.content_type" "Kampanja" -}}
 {{- else if eq .Section "sivut" -}}
   {{- $pages = where site.RegularPages "Params.content_type" "Sivu" -}}
+{{- else if eq .Section "palvelut" -}}
+  {{- $pages = where site.RegularPages "Params.content_type" "Palvelu" -}}
 {{- end -}}
 {{- $pages = where $pages "Layout" "!=" "privacy" -}}
 {{- $dated := slice -}}
