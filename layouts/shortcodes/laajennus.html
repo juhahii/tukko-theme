@@ -1,0 +1,9 @@
+{{ $items := slice }}
+{{ with .Get "items" }}
+  {{ range split . "," }}
+    {{ $items = $items | append . }}
+  {{ end }}
+{{ end }}
+{{ $show := true }}
+{{ if eq (.Get "showHeading") "false" }}{{ $show = false }}{{ end }}
+{{ partial "content-extension-block.html" (dict "title" (.Get "title") "display" (.Get "display") "showHeading" $show "items" $items) }}

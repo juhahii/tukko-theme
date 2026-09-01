@@ -152,6 +152,7 @@ collections:
         name: "body"
         widget: "markdown"
         required: false
+        hint: "Editorin +-valikosta voi lisätä laajennuslohkon (lista muuta sisältöä) keskelle tekstiä."
       - label: "Laajennukset"
         name: "extensions"
         widget: "list"

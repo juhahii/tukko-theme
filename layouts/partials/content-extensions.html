@@ -1,16 +1,3 @@
-{{ $all := where site.RegularPages "Params.content_type" "in" (slice "Tuote" "Referenssi" "Sivu" "Kampanja" "Palvelu") }}
 {{ range .Params.extensions }}
-  {{ $pages := slice }}
-  {{ range .items }}
-    {{ $match := partial "rel-by-slug.html" (dict "pages" $all "key" .) }}
-    {{ if $match }}{{ $pages = $pages | append $match }}{{ end }}
-  {{ end }}
-  {{ if $pages }}
-  <section class="content-extension">
-    {{ if and .title (not (eq .showHeading false)) }}
-      <h2>{{ .title }}</h2>
-    {{ end }}
-    {{ partial "content-list.html" (dict "items" $pages "display" (.display | default "default") "slug" "extension" "showNavigation" true) }}
-  </section>
-  {{ end }}
+  {{ partial "content-extension-block.html" . }}
 {{ end }}

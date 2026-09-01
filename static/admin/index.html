@@ -39,6 +39,97 @@
           return '/' + prefix + '/' + s + '/';
         }
 
+        var DISPLAY_OPTS = [
+          { label: 'Oletus (lista)', value: 'default' },
+          { label: 'Lista (kuten osiosivu)', value: 'list' },
+          { label: 'Kortit (grid)', value: 'cards' },
+          { label: 'Carousel - Cards', value: 'carousel-cards' },
+          { label: 'Carousel - Full width poster', value: 'carousel-poster' },
+          { label: 'Kuvaruudukko (galleria)', value: 'image-grid' },
+          { label: 'Nosto, kuva oikealla', value: 'featured-split' },
+          { label: 'Nosto, kuva vasemmalla', value: 'featured-split-left' }
+        ];
+
+        function parseAttrs(s) {
+          var out = {};
+          var re = /(\w+)="([^"]*)"/g;
+          var m;
+          while ((m = re.exec(s))) out[m[1]] = m[2];
+          return out;
+        }
+
+        function itemsToList(val) {
+          if (!val) return [];
+          if (Array.isArray(val)) return val;
+          if (typeof val.toJS === 'function') return val.toJS();
+          return String(val)
+            .split(',')
+            .map(function (s) { return s.trim(); })
+            .filter(Boolean);
+        }
+
+        CMS.registerEditorComponent({
+          id: 'laajennus',
+          label: 'Laajennus',
+          fields: [
+            { label: 'Otsikko', name: 'title', widget: 'string', required: false },
+            { label: 'Näytä otsikko', name: 'showHeading', widget: 'boolean', default: true },
+            { label: 'Näyttötila', name: 'display', widget: 'select', default: 'cards', options: DISPLAY_OPTS },
+            {
+              label: 'Sisältö',
+              name: 'items',
+              widget: 'relation',
+              collection: 'content',
+              searchFields: ['title'],
+              valueField: '{{slug}}',
+              displayFields: ['title', 'content_type'],
+              multiple: true,
+              required: false
+            }
+          ],
+          pattern: /\{\{<\s*laajennus\s+([^>]*?)\s*>\}\}/,
+          fromBlock: function (match) {
+            var a = parseAttrs(match[1] || '');
+            return {
+              title: a.title || '',
+              display: a.display || 'cards',
+              showHeading: a.showHeading !== 'false',
+              items: itemsToList(a.items)
+            };
+          },
+          toBlock: function (data) {
+            var title = String((data && data.title) || '').replace(/"/g, '');
+            var display = (data && data.display) || 'cards';
+            var show = data && data.showHeading === false ? 'false' : 'true';
+            var items = itemsToList(data && data.items).join(',');
+            return (
+              '{{< laajennus title="' +
+              title +
+              '" display="' +
+              display +
+              '" showHeading="' +
+              show +
+              '" items="' +
+              items +
+              '" >}}'
+            );
+          },
+          toPreview: function (data) {
+            var title = (data && data.title) || 'Laajennus';
+            var items = itemsToList(data && data.items);
+            var list = items.length ? items.join(', ') : '(ei valintoja)';
+            return (
+              '<div style="border:1px solid #d8d0c4;padding:0.6rem 0.8rem;border-radius:6px;margin:0.5rem 0;">' +
+              '<strong>' +
+              title +
+              '</strong>' +
+              '<div style="font-size:0.85em;margin-top:0.25rem;">' +
+              list +
+              '</div></div>'
+            );
+          }
+        });
+
         CMS.registerEventListener({
           name: 'preSave',
           handler: function (event) {

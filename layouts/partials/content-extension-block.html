@@ -1,0 +1,17 @@
+{{ $all := where site.RegularPages "Params.content_type" "in" (slice "Tuote" "Referenssi" "Sivu" "Kampanja" "Palvelu") }}
+{{ $pages := slice }}
+{{ range .items }}
+  {{ $key := strings.Trim (printf "%s" .) " \t\n\r" }}
+  {{ if $key }}
+    {{ $match := partial "rel-by-slug.html" (dict "pages" $all "key" $key) }}
+    {{ if $match }}{{ $pages = $pages | append $match }}{{ end }}
+  {{ end }}
+{{ end }}
+{{ if $pages }}
+<section class="content-extension">
+  {{ if and .title (not (eq .showHeading false)) }}
+    <h2>{{ .title }}</h2>
+  {{ end }}
+  {{ partial "content-list.html" (dict "items" $pages "display" (.display | default "default") "slug" "extension" "showNavigation" true) }}
+</section>
+{{ end }}
