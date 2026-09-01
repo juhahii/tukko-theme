@@ -1,0 +1,75 @@
+{{ $items := .items }}
+{{ $type := .type }}
+{{ $display := .display | default "default" }}
+{{ $showNav := .showNavigation | default true }}
+{{ $slug := .slug | default $type }}
+{{ $empty := .empty | default "" }}
+
+{{ if not $items }}
+  {{ with $empty }}<p>{{ . }}</p>{{ end }}
+{{ else if or (eq $display "featured-split") (eq $display "featured-split-left") }}
+  {{ partial "featured-split.html" (dict "items" $items "imageLeft" (eq $display "featured-split-left")) }}
+{{ else if eq $display "image-grid" }}
+  {{ partial "image-grid.html" (dict "items" $items "slug" $slug) }}
+{{ else if or (eq $display "carousel-cards") (eq $display "carousel-poster") (eq $display "carousel") }}
+  {{ $isPoster := eq $display "carousel-poster" }}
+  {{ if not $isPoster }}<div class="swiper-cards-wrap">{{ end }}
+  <div class="swiper {{ if $isPoster }}swiper-poster{{ else }}swiper-cards{{ end }}" data-show-navigation="{{ if $showNav }}true{{ else }}false{{ end }}">
+    <div class="swiper-wrapper">
+      {{ range $items }}
+        <div class="swiper-slide">
+          {{ if $isPoster }}
+            {{ $poster := partial "img-url.html" (dict "src" .Params.teaserImage "variant" "split") }}
+            <a href="{{ .RelPermalink }}" class="poster-slide"{{ with $poster }} style="background-image: url('{{ . }}')"{{ end }}>
+              <div class="poster-overlay">
+                <h3>{{ .Title }}</h3>
+                {{ with .Params.description }}<p>{{ . }}</p>{{ end }}
+                <span class="cta">Lue lisää →</span>
+              </div>
+            </a>
+          {{ else }}
+            {{ partial "featured-item.html" (dict "item" . "type" $type "mode" "card") }}
+          {{ end }}
+        </div>
+      {{ end }}
+    </div>
+    {{ if and $showNav $isPoster }}
+    <div class="swiper-pagination"></div>
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
+    {{ end }}
+  </div>
+  {{ if and $showNav (not $isPoster) }}
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
+  {{ end }}
+  {{ if not $isPoster }}</div>{{ end }}
+{{ else if eq $display "list" }}
+  <div class="list-stack">
+    {{ range $items }}
+      {{ partial "list-item.html" (dict "item" . "type" $type) }}
+    {{ end }}
+  </div>
+{{ else if eq $display "cards" }}
+  <div class="cards-grid">
+    {{ range $items }}
+      {{ partial "featured-item.html" (dict "item" . "type" $type "mode" "card") }}
+    {{ end }}
+  </div>
+{{ else }}
+  <ul class="simple-list">
+    {{ range $items }}
+      <li>
+        <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+        {{ if eq $type "product" }}{{ with .Params.price }} — {{ . }}{{ end }}{{ end }}
+        {{ if eq $type "reference" }}
+          {{ with .Params.usedProduct }}
+            {{ $product := partial "rel-by-slug.html" (dict "pages" (where site.RegularPages "Params.content_type" "Tuote") "key" .) }}
+            ({{ if $product }}{{ $product.Title }}{{ else }}{{ . }}{{ end }})
+          {{ end }}
+        {{ end }}
+        {{ if or (eq $type "page") (eq $type "kampanja") (eq $type "service") }} — {{ .Params.description }}{{ end }}
+      </li>
+    {{ end }}
+  </ul>
+{{ end }}

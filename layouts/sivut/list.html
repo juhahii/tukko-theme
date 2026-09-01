@@ -1,20 +1,3 @@
 {{ define "main" }}
-{{ if not (partial "show-subpages.html" "pages") }}
-  {{ partial "hidden-section.html" . }}
-{{ else }}
-  {{ $cfg := site.Data.frontpage.pages | default dict }}
-  <h2>{{ $cfg.title | default .Title }}</h2>
-  {{ with $cfg.content }}<div class="section-content">{{ . | markdownify }}</div>{{ end }}
-  {{ partial "section-ctas.html" $cfg.ctas }}
-  {{ $items := where .Site.RegularPages "Params.content_type" "Sivu" }}
-  {{ if $items }}
-    <ul>
-    {{ range $items }}
-      <li><a href="{{ .RelPermalink }}">{{ .Title }}</a> {{ with .Params.description }}– {{ . }}{{ end }}</li>
-    {{ end }}
-    </ul>
-  {{ else }}
-    <p>Ei sivuja.</p>
-  {{ end }}
-{{ end }}
+{{ partial "section-list-page.html" (dict "page" . "fpKey" "pages" "contentType" "Sivu" "ptype" "page" "empty" "Ei sivuja.") }}
 {{ end }}

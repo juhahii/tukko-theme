@@ -1,0 +1,16 @@
+{{ $page := .page }}
+{{ $fpKey := .fpKey }}
+{{ if not (partial "show-subpages.html" $fpKey) }}
+  {{ partial "hidden-section.html" $page }}
+{{ else }}
+  {{ $cfg := index (site.Data.frontpage | default dict) $fpKey | default dict }}
+  <h2>{{ $cfg.title | default $page.Title }}</h2>
+  {{ with $cfg.content }}<div class="section-content">{{ . | markdownify }}</div>{{ end }}
+  {{ partial "section-ctas.html" $cfg.ctas }}
+  {{ $items := where site.RegularPages "Params.content_type" .contentType }}
+  {{ $display := "default" }}
+  {{ with site.Data.site.listings }}
+    {{ with (index . $fpKey) }}{{ $display = . }}{{ end }}
+  {{ end }}
+  {{ partial "content-list.html" (dict "items" $items "type" $.ptype "display" $display "slug" $fpKey "empty" $.empty "showNavigation" true) }}
+{{ end }}

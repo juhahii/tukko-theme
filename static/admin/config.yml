@@ -1062,6 +1062,77 @@ collections:
                 name: "kampanjat"
                 widget: "boolean"
                 default: true
+          - label: "Listaussivujen näyttötila"
+            name: "listings"
+            widget: "object"
+            collapsed: false
+            hint: "Miten /tuotteet/, /palvelut/ ja muut osiosivut näyttävät kohteet. Samat vaihtoehdot kuin etusivun näyttötila."
+            fields:
+              - label: "Tuotteet"
+                name: "products"
+                widget: "select"
+                default: "list"
+                options:
+                  - { label: "Oletus (lista)", value: "default" }
+                  - { label: "Lista (kuten osiosivu)", value: "list" }
+                  - { label: "Kortit (grid)", value: "cards" }
+                  - { label: "Carousel - Cards", value: "carousel-cards" }
+                  - { label: "Carousel - Full width poster", value: "carousel-poster" }
+                  - { label: "Kuvaruudukko (galleria)", value: "image-grid" }
+                  - { label: "Nosto, kuva oikealla", value: "featured-split" }
+                  - { label: "Nosto, kuva vasemmalla", value: "featured-split-left" }
+              - label: "Palvelut"
+                name: "palvelut"
+                widget: "select"
+                default: "default"
+                options:
+                  - { label: "Oletus (lista)", value: "default" }
+                  - { label: "Lista (kuten osiosivu)", value: "list" }
+                  - { label: "Kortit (grid)", value: "cards" }
+                  - { label: "Carousel - Cards", value: "carousel-cards" }
+                  - { label: "Carousel - Full width poster", value: "carousel-poster" }
+                  - { label: "Kuvaruudukko (galleria)", value: "image-grid" }
+                  - { label: "Nosto, kuva oikealla", value: "featured-split" }
+                  - { label: "Nosto, kuva vasemmalla", value: "featured-split-left" }
+              - label: "Referenssit"
+                name: "references"
+                widget: "select"
+                default: "list"
+                options:
+                  - { label: "Oletus (lista)", value: "default" }
+                  - { label: "Lista (kuten osiosivu)", value: "list" }
+                  - { label: "Kortit (grid)", value: "cards" }
+                  - { label: "Carousel - Cards", value: "carousel-cards" }
+                  - { label: "Carousel - Full width poster", value: "carousel-poster" }
+                  - { label: "Kuvaruudukko (galleria)", value: "image-grid" }
+                  - { label: "Nosto, kuva oikealla", value: "featured-split" }
+                  - { label: "Nosto, kuva vasemmalla", value: "featured-split-left" }
+              - label: "Kampanjat"
+                name: "kampanjat"
+                widget: "select"
+                default: "list"
+                options:
+                  - { label: "Oletus (lista)", value: "default" }
+                  - { label: "Lista (kuten osiosivu)", value: "list" }
+                  - { label: "Kortit (grid)", value: "cards" }
+                  - { label: "Carousel - Cards", value: "carousel-cards" }
+                  - { label: "Carousel - Full width poster", value: "carousel-poster" }
+                  - { label: "Kuvaruudukko (galleria)", value: "image-grid" }
+                  - { label: "Nosto, kuva oikealla", value: "featured-split" }
+                  - { label: "Nosto, kuva vasemmalla", value: "featured-split-left" }
+              - label: "Sivut"
+                name: "pages"
+                widget: "select"
+                default: "default"
+                options:
+                  - { label: "Oletus (lista)", value: "default" }
+                  - { label: "Lista (kuten osiosivu)", value: "list" }
+                  - { label: "Kortit (grid)", value: "cards" }
+                  - { label: "Carousel - Cards", value: "carousel-cards" }
+                  - { label: "Carousel - Full width poster", value: "carousel-poster" }
+                  - { label: "Kuvaruudukko (galleria)", value: "image-grid" }
+                  - { label: "Nosto, kuva oikealla", value: "featured-split" }
+                  - { label: "Nosto, kuva vasemmalla", value: "featured-split-left" }
           - label: "Sosiaalinen media"
             name: "social"
             widget: "object"
