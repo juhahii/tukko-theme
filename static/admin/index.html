@@ -68,6 +68,131 @@
             .filter(Boolean);
         }
 
+        function parseFrontMatter(raw) {
+          var out = { title: '', type: '' };
+          var m = String(raw || '').match(/^---\n([\s\S]*?)\n---/);
+          if (!m) return out;
+          var block = m[1];
+          var t = block.match(/^title:\s*(?:["'](.+?)["']|(.+))\s*$/m);
+          if (t) out.title = (t[1] || t[2] || '').trim();
+          var c = block.match(/^content_type:\s*(?:["'](.+?)["']|(.+))\s*$/m);
+          if (c) out.type = (c[1] || c[2] || '').trim();
+          return out;
+        }
+
+        function loadSisaltoFromGateway() {
+          var user = window.netlifyIdentity && window.netlifyIdentity.currentUser();
+          var token = user && user.token && user.token.access_token;
+          var headers = token ? { Authorization: 'Bearer ' + token } : {};
+          return fetch('/.netlify/git/github/contents/content/content', { headers: headers }).then(function (res) {
+            if (!res.ok) throw new Error('gateway');
+            return res.json();
+          }).then(function (files) {
+            var mds = (files || []).filter(function (f) {
+              return f && f.type === 'file' && /\.md$/i.test(f.name) && f.name !== '_index.md';
+            });
+            return Promise.all(mds.map(function (f) {
+              return fetch('/.netlify/git/github/contents/' + f.path, { headers: headers })
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (body) {
+                  var raw = '';
+                  if (body && body.content) {
+                    try { raw = decodeURIComponent(escape(atob(body.content.replace(/\n/g, '')))); }
+                    catch (e) { raw = ''; }
+                  }
+                  var meta = parseFrontMatter(raw);
+                  var slug = String(f.name).replace(/\.md$/i, '');
+                  return { slug: slug, title: meta.title || slug, type: meta.type || '' };
+                });
+            }));
+          });
+        }
+
+        function loadSisaltoOptions() {
+          if (window.__tukkoSisaltoOpts) return Promise.resolve(window.__tukkoSisaltoOpts);
+          return fetch('/index.json', { credentials: 'same-origin' })
+            .then(function (res) {
+              if (!res.ok) throw new Error('no json');
+              return res.json();
+            })
+            .catch(function () { return loadSisaltoFromGateway(); })
+            .then(function (opts) {
+              var list = Array.isArray(opts) ? opts : [];
+              window.__tukkoSisaltoOpts = list;
+              return list;
+            })
+            .catch(function () { return []; });
+        }
+
+        var SisaltoPickControl = createClass({
+          getInitialState: function () {
+            return { options: [], loading: true, q: '' };
+          },
+          componentDidMount: function () {
+            var self = this;
+            loadSisaltoOptions().then(function (opts) {
+              self.setState({ options: opts, loading: false });
+            });
+          },
+          handleToggle: function (slug) {
+            var current = itemsToList(this.props.value);
+            var next = current.slice();
+            var i = next.indexOf(slug);
+            if (i >= 0) next.splice(i, 1);
+            else next.push(slug);
+            this.props.onChange(next);
+          },
+          render: function () {
+            var self = this;
+            var value = itemsToList(this.props.value);
+            var q = (this.state.q || '').toLowerCase();
+            var opts = this.state.options.filter(function (o) {
+              if (!q) return true;
+              return (o.title + ' ' + o.slug + ' ' + o.type).toLowerCase().indexOf(q) !== -1;
+            });
+            return h('div', {},
+              h('input', {
+                type: 'search',
+                placeholder: 'Hae sisältöä…',
+                value: this.state.q,
+                onChange: function (e) { self.setState({ q: e.target.value }); },
+                style: { width: '100%', marginBottom: '0.5rem', padding: '0.35rem 0.5rem' }
+              }),
+              this.state.loading
+                ? h('div', {}, 'Ladataan sisältöä…')
+                : h('div', {
+                    style: {
+                      maxHeight: '14rem',
+                      overflow: 'auto',
+                      border: '1px solid #d8d0c4',
+                      borderRadius: '4px',
+                      padding: '0.35rem 0.5rem'
+                    }
+                  },
+                    opts.length
+                      ? opts.map(function (o) {
+                          return h('label', {
+                            key: o.slug,
+                            style: { display: 'block', padding: '0.2rem 0', cursor: 'pointer' }
+                          },
+                            h('input', {
+                              type: 'checkbox',
+                              checked: value.indexOf(o.slug) !== -1,
+                              onChange: function () { self.handleToggle(o.slug); }
+                            }),
+                            ' ',
+                            o.title,
+                            h('span', { style: { color: '#5d6b64', fontSize: '0.85em' } }, o.type ? ' — ' + o.type : '')
+                          );
+                        })
+                      : h('div', { style: { color: '#5d6b64' } }, 'Ei sisältöä valittavaksi.')
+                  )
+            );
+          }
+        });
+
+        CMS.registerWidget('sisalto-pick', SisaltoPickControl);
+
         CMS.registerEditorComponent({
           id: 'laajennus',
           label: 'Laajennus',
@@ -75,17 +200,7 @@
             { label: 'Otsikko', name: 'title', widget: 'string', required: false },
             { label: 'Näytä otsikko', name: 'showHeading', widget: 'boolean', default: true },
             { label: 'Näyttötila', name: 'display', widget: 'select', default: 'cards', options: DISPLAY_OPTS },
-            {
-              label: 'Sisältö',
-              name: 'items',
-              widget: 'relation',
-              collection: 'content',
-              searchFields: ['title'],
-              valueField: '{{slug}}',
-              displayFields: ['title', 'content_type'],
-              multiple: true,
-              required: false
-            }
+            { label: 'Sisältö', name: 'items', widget: 'sisalto-pick', required: false }
           ],
           pattern: /\{\{<\s*laajennus\s+([^>]*?)\s*>\}\}/,
           fromBlock: function (match) {

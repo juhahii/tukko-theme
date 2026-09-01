@@ -21,6 +21,9 @@ enableRobotsTXT = true
 [services.rss]
   limit = 20
 
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+
 disableKinds = ['taxonomy', 'term']
 
 [taxonomies]

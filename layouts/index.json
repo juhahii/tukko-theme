@@ -1,0 +1,13 @@
+{{- $types := slice "Tuote" "Referenssi" "Sivu" "Kampanja" "Palvelu" -}}
+{{- $pages := where site.RegularPages "Params.content_type" "in" $types -}}
+{{- $out := slice -}}
+{{- range $pages -}}
+  {{- if ne .Layout "privacy" -}}
+    {{- $slug := "" -}}
+    {{- with .File }}{{ $slug = .BaseFileName }}{{ end -}}
+    {{- if $slug -}}
+      {{- $out = $out | append (dict "title" .Title "slug" $slug "type" (.Params.content_type | default "")) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- $out | jsonify -}}
