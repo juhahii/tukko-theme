@@ -275,7 +275,6 @@ picture { display: contents; }
     margin-right: auto;
   }
 }
-}
 
 /* Lists */
 .section-title-link {
@@ -796,10 +795,30 @@ main > .frontpage-section:first-child { border-top: none; padding-top: 0; margin
   margin-right: auto;
 }
 .content-extension {
-  margin: 2rem 0 1.5rem;
+  margin: 1.75rem 0;
+  padding: 1.1rem 1.2rem 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg);
 }
 .content-extension h2 {
-  margin: 0 0 1rem;
+  margin: 0 0 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+.content .content-extension {
+  font-size: 1rem;
+}
+.content-extension .cards-grid,
+.content-extension .list-stack,
+.content-extension .simple-list {
+  margin-top: 0;
+}
+.content-extension .simple-list {
+  margin-bottom: 0;
 }
 .product-brand {
   display: inline-block;
