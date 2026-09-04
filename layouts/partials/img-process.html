@@ -22,8 +22,8 @@
         {{- $jpeg := false -}}
         {{- $webp := false -}}
         {{- if eq $variant "card" -}}
-          {{- $jpeg = $res.Fill "480x360 Center q70 jpeg" -}}
-          {{- $webp = $res.Fill "480x360 Center q70 webp" -}}
+          {{- $jpeg = $res.Fit "480x480 q70 jpeg" -}}
+          {{- $webp = $res.Fit "480x480 q70 webp" -}}
         {{- else if eq $variant "split" -}}
           {{- $jpeg = $res.Fill "900x675 Center q75 jpeg" -}}
           {{- $webp = $res.Fill "900x675 Center q75 webp" -}}
