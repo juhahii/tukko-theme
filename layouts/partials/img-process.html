@@ -28,11 +28,11 @@
           {{- $jpeg = $res.Fill "900x675 Center q75 jpeg" -}}
           {{- $webp = $res.Fill "900x675 Center q75 webp" -}}
         {{- else if eq $variant "gallery" -}}
-          {{- $jpeg = $res.Fill "1200x900 Center q75 jpeg" -}}
-          {{- $webp = $res.Fill "1200x900 Center q75 webp" -}}
+          {{- $jpeg = $res.Fit "1200x1200 q75 jpeg" -}}
+          {{- $webp = $res.Fit "1200x1200 q75 webp" -}}
         {{- else if eq $variant "thumb" -}}
-          {{- $jpeg = $res.Fill "240x240 Center q65 jpeg" -}}
-          {{- $webp = $res.Fill "240x240 Center q65 webp" -}}
+          {{- $jpeg = $res.Fit "240x240 q65 jpeg" -}}
+          {{- $webp = $res.Fit "240x240 q65 webp" -}}
         {{- else if eq $variant "lightbox" -}}
           {{- $w := $res.Width -}}
           {{- if gt $w 1920 -}}{{ $w = 1920 }}{{- end -}}
