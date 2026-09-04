@@ -336,7 +336,7 @@ picture { display: contents; }
   aspect-ratio: 1 / 1;
   object-fit: contain;
   object-position: center;
-  background: var(--color-bg);
+  background: #fff;
   border-radius: 0;
 }
 .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
