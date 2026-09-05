@@ -9,6 +9,9 @@ title = 'Yrityksen nimi'
 defaultContentLanguage = 'fi'
 theme = 'tukko'
 
+# Raise if a frontpage image grid processes many originals (default 30s).
+timeout = '180s'
+
 enableRobotsTXT = true
 
 [params]
