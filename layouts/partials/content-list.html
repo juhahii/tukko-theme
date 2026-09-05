@@ -10,7 +10,7 @@
 {{ else if or (eq $display "featured-split") (eq $display "featured-split-left") }}
   {{ partial "featured-split.html" (dict "items" $items "imageLeft" (eq $display "featured-split-left")) }}
 {{ else if eq $display "image-grid" }}
-  {{ partial "image-grid.html" (dict "items" $items "slug" $slug) }}
+  {{ partial "image-grid.html" (dict "items" $items "slug" $slug "visible" .visible) }}
 {{ else if or (eq $display "carousel-cards") (eq $display "carousel-poster") (eq $display "carousel") }}
   {{ $isPoster := eq $display "carousel-poster" }}
   {{ if not $isPoster }}<div class="swiper-cards-wrap">{{ end }}

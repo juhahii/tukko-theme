@@ -52,6 +52,6 @@
   {{ else if eq $widget "contact" }}
     {{ partial "contact-form.html" . }}
   {{ else if $showSub }}
-    {{ partial "content-list.html" (dict "items" $items "type" $type "display" $config.display "showNavigation" ($config.showNavigation | default true) "slug" $slug) }}
+    {{ partial "content-list.html" (dict "items" $items "type" $type "display" $config.display "showNavigation" ($config.showNavigation | default true) "slug" $slug "visible" $config.limit) }}
   {{ end }}
 </section>

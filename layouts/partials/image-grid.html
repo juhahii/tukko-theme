@@ -32,8 +32,10 @@
 
 {{ if $gallery }}
 {{ $gid := printf "gallery-%s" $slug }}
+{{ $cells := $gallery }}
+{{ with .visible }}{{ $cells = first . $gallery }}{{ end }}
 <div class="image-grid" data-gallery="{{ $gid }}">
-  {{ range $i, $img := $gallery }}
+  {{ range $i, $img := $cells }}
     <button type="button" class="image-grid-cell" data-index="{{ $i }}" aria-label="{{ $img.title }}">
       {{ $alt := $img.title }}{{ with $img.caption }}{{ $alt = printf "%s — %s" $img.title . }}{{ end }}
       {{ partial "img.html" (dict "src" $img.src "alt" $alt "variant" "card") }}

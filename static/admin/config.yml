@@ -470,6 +470,7 @@ collections:
                 widget: "number"
                 value_type: "int"
                 default: 3
+                hint: "Kuvaruudukossa etusivulla näkyvien kuvien määrä. Klikkaamalla kuvaa voi selata loput."
               - label: "Näytä navigointinuolit"
                 name: "showNavigation"
                 widget: "boolean"
