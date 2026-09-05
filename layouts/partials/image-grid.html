@@ -69,7 +69,8 @@
       <div class="swiper-wrapper">
         {{ range $gallery }}
           <div class="swiper-slide">
-            {{ partial "img.html" (dict "src" .src "alt" "" "variant" "thumb") }}
+            {{/* Same 480px card as the grid cell — skips a third Fit per photo. */}}
+            {{ partial "img.html" (dict "src" .src "alt" "" "variant" "card") }}
           </div>
         {{ end }}
       </div>

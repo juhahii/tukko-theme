@@ -35,9 +35,12 @@
           {{- $webp = $res.Fit "240x240 q65 webp" -}}
         {{- else if eq $variant "lightbox" -}}
           {{- $w := $res.Width -}}
-          {{- if gt $w 1920 -}}{{ $w = 1920 }}{{- end -}}
-          {{- $jpeg = $res.Resize (printf "%dx q80 jpeg" $w) -}}
-          {{- $webp = $res.Resize (printf "%dx q80 webp" $w) -}}
+          {{- if gt $w 1920 -}}
+            {{- $jpeg = $res.Resize "1920x q80 jpeg" -}}
+            {{- $webp = $res.Resize "1920x q80 webp" -}}
+          {{- else -}}
+            {{- $jpeg = $res -}}
+          {{- end -}}
         {{- else if eq $variant "logo" -}}
           {{- $fmt := "jpeg" -}}
           {{- if eq $ext ".png" -}}{{ $fmt = "png" }}{{- end -}}
