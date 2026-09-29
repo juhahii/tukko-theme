@@ -19,22 +19,22 @@
   {{ with $listPage }}{{ $listUrl = .RelPermalink }}{{ end }}
 {{ end }}
 
-<section class="frontpage-section{{ if $landing }} landing-section{{ end }}{{ if $image }} landing-section--with-image{{ end }}" id="osio-{{ $slug }}">
-  {{ if or $landing $image }}
-    <div class="landing-copy">
+<section class="frontpage-section{{ if $landing }} landing-section{{ end }}" id="osio-{{ $slug }}">
+  {{ if $image }}
+    <div class="landing-section--with-image">
       {{ if and $showHeading $config.title }}
         <h2>{{ if $listUrl }}<a class="section-title-link" href="{{ $listUrl }}">{{ $config.title }}</a>{{ else }}{{ $config.title }}{{ end }}</h2>
       {{ end }}
-      {{ with $config.content }}
-        <div class="section-content">{{ . | markdownify }}</div>
-      {{ end }}
-      {{ partial "section-ctas.html" $config.ctas }}
-    </div>
-    {{ with $image }}
       <div class="landing-media">
-        {{ partial "img.html" (dict "src" . "alt" $config.title "variant" "split" "eager" true) }}
+        {{ partial "img.html" (dict "src" $image "alt" $config.title "variant" "split" "eager" true) }}
       </div>
-    {{ end }}
+      <div class="landing-copy">
+        {{ with $config.content }}
+          <div class="section-content">{{ . | markdownify }}</div>
+        {{ end }}
+        {{ partial "section-ctas.html" $config.ctas }}
+      </div>
+    </div>
   {{ else }}
     {{ if and $showHeading $config.title }}
       <h2>{{ if $listUrl }}<a class="section-title-link" href="{{ $listUrl }}">{{ $config.title }}</a>{{ else }}{{ $config.title }}{{ end }}</h2>
