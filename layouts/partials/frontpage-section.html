@@ -10,6 +10,12 @@
 {{ $display := $config.layout | default $config.display }}
 {{ $sectionLayout := $config.sectionLayout | default "default" }}
 {{ $isHero := and (eq $sectionLayout "hero") $image }}
+{{ $split := "" }}
+{{ if and $image (eq $sectionLayout "image-left") }}
+  {{ $split = "left" }}
+{{ else if and $image (or (eq $sectionLayout "image-right") (eq $sectionLayout "default")) }}
+  {{ $split = "right" }}
+{{ end }}
 {{ $listUrl := "" }}
 {{ if and $showSub (not $landing) (not $widget) }}
   {{ $listPage := false }}
@@ -38,8 +44,8 @@
         {{ partial "section-ctas.html" $config.ctas }}
       </div>
     </div>
-  {{ else if $image }}
-    <div class="landing-section--with-image">
+  {{ else if $split }}
+    <div class="landing-section--with-image{{ if eq $split "left" }} landing-section--image-left{{ end }}">
       {{ if and $showHeading $config.title }}
         <h2>{{ if $listUrl }}<a class="section-title-link" href="{{ $listUrl }}">{{ $config.title }}</a>{{ else }}{{ $config.title }}{{ end }}</h2>
       {{ end }}
@@ -61,6 +67,19 @@
       <div class="section-content">{{ . | markdownify }}</div>
     {{ end }}
     {{ partial "section-ctas.html" $config.ctas }}
+  {{ end }}
+
+  {{ with $config.imageGrid }}
+  <ul class="section-image-grid">
+    {{ range . }}
+      {{ if .image }}
+      <li>
+        {{ partial "img.html" (dict "src" .image "alt" (.text | default $config.title) "variant" "figure") }}
+        {{ with .text }}<p>{{ . }}</p>{{ end }}
+      </li>
+      {{ end }}
+    {{ end }}
+  </ul>
   {{ end }}
 
   {{ if eq $widget "people" }}

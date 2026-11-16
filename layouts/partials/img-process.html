@@ -44,6 +44,15 @@
           {{- else -}}
             {{- $jpeg = $res -}}
           {{- end -}}
+        {{- else if eq $variant "figure" -}}
+          {{- $fmt := "jpeg" -}}
+          {{- if eq $ext ".png" -}}{{ $fmt = "png" }}{{- end -}}
+          {{- $w := $res.Width -}}
+          {{- if gt $w 640 -}}{{ $w = 640 }}{{- end -}}
+          {{- $jpeg = $res.Resize (printf "%dx %s q85" $w $fmt) -}}
+          {{- if ne $fmt "png" -}}
+            {{- $webp = $res.Resize (printf "%dx webp q80" $w) -}}
+          {{- end -}}
         {{- else if eq $variant "logo" -}}
           {{- $fmt := "jpeg" -}}
           {{- if eq $ext ".png" -}}{{ $fmt = "png" }}{{- end -}}

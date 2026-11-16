@@ -273,15 +273,32 @@ collections:
                 name: "image"
                 widget: "image"
                 required: false
-                hint: "Oletus-asettelussa kuva tulee tekstin viereen (mobiilissa otsikko, kuva, teksti). Hero-asettelussa kuva on tausta, jonka päällä teksti näkyy."
+                hint: "Käytetään hero- sekä kuva vasemmalla- ja kuva oikealla -asetteluissa. Oletus-asettelussa kuva näytetään myös oikealla, jos se on asetettu."
+              - label: "Kuvagridi"
+                name: "imageGrid"
+                widget: "list"
+                required: false
+                label_singular: "Kuva"
+                summary: "{{fields.text}}"
+                hint: "Kuvia ruudukossa osion sisällön jälkeen. Teksti näytetään kuvan alla."
+                fields:
+                  - label: "Kuva"
+                    name: "image"
+                    widget: "image"
+                  - label: "Teksti"
+                    name: "text"
+                    widget: "string"
+                    required: false
               - label: "Osion asettelu"
                 name: "sectionLayout"
                 widget: "select"
                 default: "default"
-                hint: "Oletus = nykyinen asettelu. Hero = kuva taustaksi, otsikko ja teksti kuvan päällä. Ilman kuvaa käytetään oletusta."
+                hint: "Oletus = teksti (ja kuva oikealla, jos kuva on asetettu). Hero = kuva taustaksi. Kuva vasemmalla tai oikealla = teksti ja kuva vierekkäin."
                 options:
                   - { label: "Oletus", value: "default" }
                   - { label: "Hero", value: "hero" }
+                  - { label: "Kuva vasemmalla", value: "image-left" }
+                  - { label: "Kuva oikealla", value: "image-right" }
               - label: "Toimintakehotteet (CTA)"
                 name: "ctas"
                 widget: "list"

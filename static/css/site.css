@@ -388,6 +388,31 @@ main > .frontpage-section:first-child { border-top: none; padding-top: 0; margin
   font-weight: 500;
   font-size: 0.95rem;
 }
+.section-image-grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1.5rem 1rem;
+  margin: 0.25rem 0 1.5rem;
+  padding: 0;
+}
+.section-image-grid li {
+  margin: 0;
+  text-align: center;
+}
+.section-image-grid img {
+  width: auto;
+  max-width: 100%;
+  max-height: 120px;
+  margin: 0 auto 0.7rem;
+  object-fit: contain;
+}
+.section-image-grid p {
+  margin: 0;
+  font-weight: 650;
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
 
 /* Landing / featured split: stacked order is headline, image, copy.
    From 768px the image sits in the right (or left) column. */
@@ -431,6 +456,13 @@ main > .frontpage-section:first-child { border-top: none; padding-top: 0; margin
   .landing-section--with-image .landing-media {
     grid-column: 2;
     grid-row: 1 / span 2;
+  }
+  .landing-section--with-image.landing-section--image-left > h2,
+  .landing-section--with-image.landing-section--image-left .landing-copy {
+    grid-column: 2;
+  }
+  .landing-section--with-image.landing-section--image-left .landing-media {
+    grid-column: 1;
   }
   .landing-section--with-image > .landing-media:first-child + .landing-copy {
     grid-row: 1 / span 2;
