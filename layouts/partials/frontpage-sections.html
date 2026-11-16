@@ -1,0 +1,42 @@
+{{/*
+  Enabled frontpage sections, in display order.
+  Prefers data/frontpage.yaml `sections`. Falls back to the old named keys.
+*/}}
+{{ $fp := site.Data.frontpage | default dict }}
+{{ $out := slice }}
+{{ if $fp.sections }}
+  {{ range $fp.sections }}
+    {{ if .enabled | default true }}
+      {{ $out = $out | append . }}
+    {{ end }}
+  {{ end }}
+{{ else }}
+  {{ $legacy := slice
+    (dict "key" "welcome" "slug" "tervetuloa" "list" "none")
+    (dict "key" "about" "slug" "tietoa" "list" "none")
+    (dict "key" "products" "slug" "tuotteet" "list" "Tuote")
+    (dict "key" "palvelut" "slug" "palvelut" "list" "Palvelu")
+    (dict "key" "references" "slug" "referenssit" "list" "Referenssi")
+    (dict "key" "pages" "slug" "sivut" "list" "Sivu")
+    (dict "key" "kampanjat" "slug" "kampanjat" "list" "Kampanja")
+    (dict "key" "people" "slug" "henkilot" "list" "people")
+    (dict "key" "manufacturers" "slug" "valmistajat" "list" "manufacturers")
+    (dict "key" "contactForm" "slug" "yhteystiedot" "list" "contact")
+  }}
+  {{ range $legacy }}
+    {{ $cfg := index $fp .key | default dict }}
+    {{ if $cfg.enabled | default true }}
+      {{ $list := .list }}
+      {{ if and (ne $list "none") (ne $list "people") (ne $list "manufacturers") (ne $list "contact") }}
+        {{ if not ($cfg.showSubPages | default true) }}{{ $list = "none" }}{{ end }}
+      {{ end }}
+      {{ $out = $out | append (merge $cfg (dict
+        "slug" ($cfg.slug | default .slug)
+        "list" ($cfg.list | default $list)
+        "layout" ($cfg.layout | default $cfg.display)
+      )) }}
+    {{ end }}
+  {{ end }}
+  {{ $out = sort $out "order" }}
+{{ end }}
+{{ return $out }}

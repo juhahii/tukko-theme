@@ -1,7 +1,13 @@
 {{/*
-  Returns whether a frontpage category should expose its list + item pages.
+  Whether a category list page is public.
   Usage: {{ if partial "show-subpages.html" "products" }}
   Keys: products | references | pages | kampanjat | palvelut
+  With universal frontpage sections, list pages stay public (nav is in site.yaml).
 */}}
-{{ $cfg := index (site.Data.frontpage | default dict) . | default dict }}
-{{ return ($cfg.showSubPages | default true) }}
+{{ $fp := site.Data.frontpage | default dict }}
+{{ $ok := true }}
+{{ if not $fp.sections }}
+  {{ $cfg := index $fp . | default dict }}
+  {{ $ok = $cfg.showSubPages | default true }}
+{{ end }}
+{{ return $ok }}

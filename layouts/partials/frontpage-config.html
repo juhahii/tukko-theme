@@ -1,0 +1,27 @@
+{{/*
+  Frontpage section config for a list page.
+  Argument: products | references | pages | kampanjat | palvelut
+*/}}
+{{ $fpKey := . }}
+{{ $want := dict
+  "products" "Tuote"
+  "references" "Referenssi"
+  "pages" "Sivu"
+  "kampanjat" "Kampanja"
+  "palvelut" "Palvelu"
+}}
+{{ $list := index $want $fpKey }}
+{{ $fp := site.Data.frontpage | default dict }}
+{{ $cfg := dict }}
+{{ $found := false }}
+{{ if $fp.sections }}
+  {{ range $fp.sections }}
+    {{ if and (not $found) (eq .list $list) }}
+      {{ $cfg = . }}
+      {{ $found = true }}
+    {{ end }}
+  {{ end }}
+{{ else }}
+  {{ $cfg = index $fp $fpKey | default dict }}
+{{ end }}
+{{ return $cfg }}

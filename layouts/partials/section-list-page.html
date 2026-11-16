@@ -3,7 +3,7 @@
 {{ if not (partial "show-subpages.html" $fpKey) }}
   {{ partial "hidden-section.html" $page }}
 {{ else }}
-  {{ $cfg := index (site.Data.frontpage | default dict) $fpKey | default dict }}
+  {{ $cfg := partial "frontpage-config.html" $fpKey }}
   <h2>{{ $cfg.title | default $page.Title }}</h2>
   {{ with $cfg.content }}<div class="section-content">{{ . | markdownify }}</div>{{ end }}
   {{ partial "section-ctas.html" $cfg.ctas }}
