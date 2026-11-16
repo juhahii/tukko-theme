@@ -8,6 +8,8 @@
 {{ $image := $config.image }}
 {{ $showHeading := $config.showHeading | default true }}
 {{ $display := $config.layout | default $config.display }}
+{{ $sectionLayout := $config.sectionLayout | default "default" }}
+{{ $isHero := and (eq $sectionLayout "hero") $image }}
 {{ $listUrl := "" }}
 {{ if and $showSub (not $landing) (not $widget) }}
   {{ $listPage := false }}
@@ -20,8 +22,23 @@
   {{ with $listPage }}{{ $listUrl = .RelPermalink }}{{ end }}
 {{ end }}
 
-<section class="frontpage-section{{ if $landing }} landing-section{{ end }}" id="osio-{{ $slug }}">
-  {{ if $image }}
+<section class="frontpage-section{{ if $landing }} landing-section{{ end }}{{ if $isHero }} frontpage-section--hero{{ end }}" id="osio-{{ $slug }}">
+  {{ if $isHero }}
+    <div class="section-hero">
+      <div class="section-hero-media" aria-hidden="true">
+        {{ partial "img.html" (dict "src" $image "alt" "" "variant" "hero" "eager" true) }}
+      </div>
+      <div class="section-hero-copy">
+        {{ if and $showHeading $config.title }}
+          <h2>{{ if $listUrl }}<a class="section-title-link" href="{{ $listUrl }}">{{ $config.title }}</a>{{ else }}{{ $config.title }}{{ end }}</h2>
+        {{ end }}
+        {{ with $config.content }}
+          <div class="section-content">{{ . | markdownify }}</div>
+        {{ end }}
+        {{ partial "section-ctas.html" $config.ctas }}
+      </div>
+    </div>
+  {{ else if $image }}
     <div class="landing-section--with-image">
       {{ if and $showHeading $config.title }}
         <h2>{{ if $listUrl }}<a class="section-title-link" href="{{ $listUrl }}">{{ $config.title }}</a>{{ else }}{{ $config.title }}{{ end }}</h2>

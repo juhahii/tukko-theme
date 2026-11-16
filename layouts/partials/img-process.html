@@ -27,6 +27,9 @@
         {{- else if eq $variant "split" -}}
           {{- $jpeg = $res.Fill "900x675 Center q75 jpeg" -}}
           {{- $webp = $res.Fill "900x675 Center q75 webp" -}}
+        {{- else if eq $variant "hero" -}}
+          {{- $jpeg = $res.Fill "1600x900 Center q75 jpeg" -}}
+          {{- $webp = $res.Fill "1600x900 Center q75 webp" -}}
         {{- else if eq $variant "gallery" -}}
           {{- $jpeg = $res.Fit "1200x1200 q75 jpeg" -}}
           {{- $webp = $res.Fit "1200x1200 q75 webp" -}}

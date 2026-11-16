@@ -273,7 +273,15 @@ collections:
                 name: "image"
                 widget: "image"
                 required: false
-                hint: "Jos kuva on lisätty, osio näytetään kahdessa sarakkeessa työpöydällä. Pienellä näytöllä järjestys on otsikko, kuva, teksti."
+                hint: "Oletus-asettelussa kuva tulee tekstin viereen (mobiilissa otsikko, kuva, teksti). Hero-asettelussa kuva on tausta, jonka päällä teksti näkyy."
+              - label: "Osion asettelu"
+                name: "sectionLayout"
+                widget: "select"
+                default: "default"
+                hint: "Oletus = nykyinen asettelu. Hero = kuva taustaksi, otsikko ja teksti kuvan päällä. Ilman kuvaa käytetään oletusta."
+                options:
+                  - { label: "Oletus", value: "default" }
+                  - { label: "Hero", value: "hero" }
               - label: "Toimintakehotteet (CTA)"
                 name: "ctas"
                 widget: "list"
